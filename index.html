@@ -87,6 +87,12 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .btn.p.ring{animation:ring 2.2s ease-out infinite}
 @keyframes ring{0%{box-shadow:3px 3px 0 var(--acc),0 0 0 0 color-mix(in srgb,var(--pri) 55%,transparent)}70%,100%{box-shadow:3px 3px 0 var(--acc),0 0 0 16px transparent}}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.bib{transform:none}.scan{display:none}}
+.qrs{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 16px;margin:0 -4px 4px;scrollbar-width:thin}
+.qchip{flex:none;display:flex;align-items:center;gap:9px;min-height:46px;padding:0 16px 0 6px;border-radius:99px;border:1.5px solid var(--bd);background:var(--card);color:var(--fg);font:700 13px Manrope,sans-serif;cursor:pointer;transition:transform .12s,border-color .15s}
+.qchip i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--acc);color:#1a2238;font:800 12px Syne,sans-serif;font-style:normal}
+.qchip.on{border-color:var(--pri);box-shadow:3px 3px 0 var(--acc)}
+.qchip.add{padding:0 18px;border-style:dashed;color:var(--pri)}
+.qchip:hover{border-color:var(--pri)}.qchip:active{transform:translate(2px,2px)}
 </style>
 </head>
 <body>
@@ -96,10 +102,16 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 <script>
 const $=s=>document.querySelector(s),app=$('#app');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const K='qr-runner-ja-v2';let mem=null;
-const load=()=>{try{const v=localStorage.getItem(K);return v?JSON.parse(v):mem}catch{return mem}};
-const save=p=>{mem=p;try{localStorage.setItem(K,JSON.stringify(p))}catch{}};
-const wipe=()=>{mem=null;try{localStorage.removeItem(K)}catch{}};
+const K='qr-runner-ja-v3',OLD='qr-runner-ja-v2';let mem=null;
+const uid=()=>Math.random().toString(36).slice(2,8);
+const rd=k=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}};
+function state(){let t=rd(K)||mem;if(!t){const o=rd(OLD);t=o&&o.name?{active:'a',list:[{...o,id:'a'}]}:{active:null,list:[]}}
+ if(!t.list.some(x=>x.id===t.active))t.active=t.list[0]?t.list[0].id:null;mem=t;return t}
+const persist=t=>{mem=t;try{localStorage.setItem(K,JSON.stringify(t))}catch{}};
+const load=()=>{const t=state();return t.list.find(x=>x.id===t.active)||null};
+const setActive=id=>{const t=state();t.active=id;persist(t)};
+const upsert=o=>{const t=state(),i=t.list.findIndex(x=>x.id===o.id);i<0?t.list.push(o):t.list[i]=o;t.active=o.id;persist(t)};
+const removeP=id=>{const t=state();t.list=t.list.filter(x=>x.id!==id);t.active=t.list[0]?t.list[0].id:null;persist(t)};
 const F=['name','nickname','city','group','initials','cName','cPhone','allergies','blood','meds','msg','showMed'];
 const b64e=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const b64d=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
@@ -121,9 +133,10 @@ function qrSvg(q){const n=q.getModuleCount(),m=2;let d='';for(let r=0;r<n;r++)fo
 function qrPng(q,name){const n=q.getModuleCount(),m=2,z=Math.ceil(1000/(n+2*m)),s=(n+2*m)*z,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#faf7ef';x.fillRect(0,0,s,s);x.fillStyle='#17233d';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect((k+m)*z,(r+m)*z,z,z);const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`qr-runner-${(name||'perfil').toLowerCase().replace(/\W+/g,'-')}.png`;document.body.appendChild(a);a.click();a.remove()}
 const head=(right='')=>`<header class="top"><a class="logo" href="#/"><i>⚡</i><span>QR Runner<small>JA Pernambuco</small></span></a>${right}</header>`;
 
+function chips(p){const l=state().list;return `<div class="qrs" aria-label="Meus QR Codes">${l.map(x=>`<button type="button" class="qchip${x.id===p.id?' on':''}" data-id="${x.id}"><i>${esc(x.initials||initials(x.name))}</i><span>${esc(x.label||x.nickname||x.name.split(' ')[0])}</span></button>`).join('')}<a class="qchip add" href="#/novo">＋ Novo QR</a></div>`}
 function dashboard(p){
   const url=link(p),q=makeQR(url);
-  app.innerHTML=`<div class="wrap">${head('<a class="btn" href="#/perfil">Editar perfil</a>')}
+  app.innerHTML=`<div class="wrap">${head('<a class="btn" href="#/perfil">Editar este QR</a>')}${chips(p)}
   <div class="mono" style="color:var(--pri)">Bom treino, ${esc(p.nickname||p.name.split(' ')[0])}</div>
   <h1 style="font-size:clamp(34px,7vw,52px);margin:10px 0 22px">Sua segurança<br><span style="color:var(--pri)">vai com você.</span></h1>
   <div class="bib"><i class="pin a"></i><i class="pin b"></i><i class="pin c"></i><i class="pin d"></i>
@@ -133,24 +146,26 @@ function dashboard(p){
   ${ready(p)}
   <div class="grid g2" style="margin-top:18px">
    <div class="card"><div class="mono">Central de segurança</div>
-    <div class="actions"><a class="btn p" href="${esc(url.slice(url.indexOf('#')))}">Abrir visão pública</a><button class="btn" id="cp">Copiar link público</button><button class="btn" id="dl">Baixar QR Code</button><button class="btn" id="pr">Imprimir / salvar PDF</button><a class="btn" href="#/perfil">Editar meu perfil</a><button class="btn d" id="rm">Excluir perfil</button></div>
+    <div class="actions"><a class="btn p" href="${esc(url.slice(url.indexOf('#')))}">Abrir visão pública</a><button class="btn" id="cp">Copiar link público</button><button class="btn" id="dl">Baixar QR Code</button><button class="btn" id="pr">Imprimir / salvar PDF</button><a class="btn" href="#/perfil">Editar este QR</a><a class="btn" href="#/duplicar">Duplicar este QR</a><button class="btn d" id="rm" style="grid-column:1/-1">Excluir este QR</button></div>
     <div class="note">Todos os dados ficam <b>dentro do próprio QR</b> e no seu dispositivo. Ao editar o perfil, o QR muda: baixe e imprima o novo. QRs antigos continuam mostrando os dados antigos.</div></div>
    <div class="card" style="text-align:center"><div class="mono" style="text-align:left">Seu código pessoal</div><h2 style="font-size:24px;text-align:left;margin-top:8px">Pronto para<br>colar na pouch.</h2>
     ${q?`<div class="qrbox">${qrSvg(q)}<i class="scan"></i></div>`:'<p class="note">Informações demais para caber no QR. Encurte a mensagem ou os campos médicos.</p>'}
     <div class="link">${esc(url)}</div></div></div></div>`;
   $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(url);toast('Link copiado')}catch{prompt('Copie seu link público:',url)}};
-  $('#dl').onclick=()=>q?qrPng(q,p.nickname||p.name):toast('QR muito grande');
+  $('#dl').onclick=()=>q?qrPng(q,p.label||p.nickname||p.name):toast('QR muito grande');
   $('#pr').onclick=()=>{if(!q)return toast('QR muito grande');$('#sheet').innerHTML=`<h1>${esc(p.name)}</h1><p>Em caso de emergência, escaneie</p>${qrSvg(q)}<p>QR Runner · JA Pernambuco</p>`;window.print()};
-  $('#rm').onclick=()=>{if(confirm('Excluir seu perfil deste dispositivo? QRs já impressos continuarão funcionando.')){wipe();location.hash='#/perfil';route()}};
+  $('#rm').onclick=()=>{if(confirm('Excluir este QR deste aparelho? Os adesivos já impressos continuarão funcionando.')){removeP(p.id);location.hash='#/';route()}};
+  document.querySelectorAll('.qchip[data-id]').forEach(b=>b.onclick=()=>{setActive(b.dataset.id);route()});
 }
 
-function form(p){
-  const v=p||{showMed:true},isNew=!p,f=k=>esc(v[k]||'');
-  app.innerHTML=`<div class="wrap" style="max-width:760px">${head(isNew?'':'<a class="btn" href="#/">Cancelar</a>')}
+function form(p,base){
+  const v=p||base||{showMed:true},isNew=!p,f=k=>esc(v[k]||'');
+  app.innerHTML=`<div class="wrap" style="max-width:760px">${head(isNew&&!load()?'':'<a class="btn" href="#/">Cancelar</a>')}
   <div class="mono" style="color:var(--pri)">${isNew?'Primeiro passo':'Editar informações'}</div>
   <h1 style="font-size:clamp(30px,6vw,44px);margin:8px 0 22px">${isNew?'Monte sua safety card.':'Seu perfil, do seu jeito.'}</h1>
   <form id="f" class="grid">
   <section class="card"><div class="mono" style="margin-bottom:14px">Sobre você</div><div class="f2">
+   <label class="full">Nome deste QR <small style="font-weight:400;color:var(--mut)">só você vê</small><input name="label" maxlength="30" value="${f('label')}" placeholder="Ex.: Bolsa de corrida, Filha, Bike"></label>
    <label class="full">Nome completo<input name="name" required maxlength="60" value="${f('name')}" placeholder="Como podemos te chamar?"></label>
    <label>Apelido (opcional)<input name="nickname" maxlength="20" value="${f('nickname')}" placeholder="Ex.: Naná"></label>
    <label>Iniciais no cartão<input name="initials" maxlength="3" value="${f('initials')}" placeholder="AC"></label>
@@ -170,7 +185,7 @@ function form(p){
   $('#f').onsubmit=e=>{e.preventDefault();const d=new FormData(e.target),o={};F.forEach(k=>o[k]=k==='showMed'?sm.checked:(d.get(k)||'').toString().trim());
    if(!/\d{8,}/.test(o.cPhone.replace(/\D/g,'')))return toast('Confira o telefone do contato');
    o.initials=(o.initials||initials(o.name)).toUpperCase();if(!makeQR(link(o)))return toast('Texto longo demais para o QR');
-   save(o);toast('Perfil salvo');if(!p)confetti();location.hash='#/'};
+   o.label=(d.get('label')||'').toString().trim();o.id=p?p.id:uid();upsert(o);toast('Perfil salvo');if(!p)confetti();location.hash='#/'};
 }
 
 function pub(p){
@@ -190,7 +205,7 @@ function invalid(){app.innerHTML=`<div class="wrap" style="max-width:520px;text-
 function route(){
   const h=location.hash.slice(1)||'/',p=load();window.scrollTo(0,0);
   if(h.startsWith('/e/')){const d=dec(h.slice(3));return d?pub(d):invalid()}
-  if(h==='/perfil'||!p)return form(p);
+  if(h==='/novo')return form(null);if(h==='/duplicar'&&p)return form(null,{...p,label:''});if(h==='/perfil'||!p)return form(p);
   dashboard(p);
 }
 addEventListener('hashchange',route);route();

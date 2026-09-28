@@ -3,6 +3,7 @@
 Perfil de emergência em QR Code para quem corre. Sem cadastro e sem servidor: os dados ficam no dispositivo e dentro do próprio QR.
 
 ## Novidades desta versão
+- **Vários QR Codes no mesmo aparelho:** crie quantos quiser (você, filha, bike, pouch de corrida). Alterne pela faixa no topo do painel, use **Duplicar este QR** para partir de um perfil pronto e **Excluir este QR** para remover só o atual. Cada QR tem um nome que só você vê. Quem já tinha um perfil salvo não perde nada: ele vira o primeiro QR da lista.
 - **Número de peito:** o cartão do perfil agora é um bib de corrida, com um número próprio de cada pessoa (também aparece na página de quem escaneia).
 - **Prontidão do perfil:** barra que mostra o quanto o perfil está completo e o que falta.
 - **QR com "radar":** moldura de scanner e uma linha que varre o código ao abrir o painel.
@@ -29,6 +30,7 @@ Perfil de emergência em QR Code para quem corre. Sem cadastro e sem servidor: o
 ## Limitações
 - Editar o perfil muda o QR. QRs antigos continuam mostrando os dados antigos.
 - Não é possível desativar um QR já impresso, pois os dados estão dentro dele.
+- Os QR Codes ficam guardados no navegador deste aparelho; limpar os dados do navegador apaga a lista (os adesivos impressos continuam funcionando).
 - Quem tiver o QR vê tudo que foi preenchido: compartilhe só o essencial.
 
 ## Tecnologia
