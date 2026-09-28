@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QR Runner</title>
+<meta name="description" content="Perfil de emergência em QR Code para quem corre.">
+<meta name="theme-color" content="#1f2f57">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="brand.css">
+<style>
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--c-bg);color:var(--c-text);font:400 16px/1.5 var(--font);padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+h1,h2,h3{font-family:var(--font-display);margin:0;line-height:1.08;letter-spacing:-.02em}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:980px;margin:0 auto;padding:16px 18px 56px}
+.eyebrow{font:600 11px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--c-muted)}
+.eyebrow.p{color:var(--c-primary)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 22px}
+.brand{display:flex;align-items:center;gap:11px;font:800 17px var(--font-display)}
+.brand img{width:40px;height:40px;border-radius:11px}
+.brand small{display:block;font:600 10px ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--c-primary)}
+.card{background:var(--c-surface);border:1px solid var(--c-line);border-radius:var(--radius);padding:22px}
+.dark{background:var(--c-dark);color:var(--c-on-dark);border-radius:calc(var(--radius) + 6px);position:relative;overflow:hidden}
+.dark:before{content:"";position:absolute;right:-60px;top:-70px;width:180px;height:180px;border-radius:50%;border:20px solid color-mix(in srgb,var(--c-accent) 18%,transparent)}
+.dark>*{position:relative}
+.av{display:grid;place-items:center;width:64px;height:64px;border-radius:16px;background:var(--c-accent);color:#1a2238;font:800 22px var(--font-display);flex:none;box-shadow:4px 4px 0 var(--c-primary)}
+.row{display:flex;gap:16px;align-items:center}
+.grid{display:grid;gap:18px}
+@media(min-width:820px){.g2{grid-template-columns:1fr 360px}.f2{grid-template-columns:1fr 1fr}}
+.f2{display:grid;gap:14px}.full{grid-column:1/-1}
+label{display:block;font-size:13px;font-weight:700}
+label small{font-weight:400;color:var(--c-muted)}
+input,select,textarea{width:100%;margin-top:6px;padding:13px;border:1.5px solid var(--c-line);border-radius:12px;background:var(--c-bg);color:var(--c-text);font:inherit}
+input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visible{outline:3px solid var(--c-primary);outline-offset:2px}
+input:disabled,select:disabled{opacity:.45}
+input[type=checkbox]{width:22px;height:22px;margin:2px 0 0;accent-color:var(--c-primary);flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:13px;border:1.5px solid var(--c-line);background:var(--c-surface);color:var(--c-text);font:700 14px var(--font);cursor:pointer;text-align:center}
+.btn:hover{border-color:var(--c-primary)}
+.btn.p{background:var(--c-primary);border-color:var(--c-primary);color:var(--c-on-primary);box-shadow:var(--shadow)}
+.btn.sos{background:var(--c-danger);border-color:var(--c-danger);color:#fff;min-height:60px;font-size:17px;width:100%}
+.btn.big{min-height:56px;font-size:16px}
+.btn.d{color:var(--c-danger);border-color:color-mix(in srgb,var(--c-danger) 40%,transparent)}
+.btn[disabled]{opacity:.5;cursor:wait}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.qrbox{background:#faf7ef;border-radius:18px;padding:10px;width:min(100%,290px);margin:14px auto 0;border:1px solid var(--c-line)}
+.qrbox svg{display:block;width:100%;height:auto}
+.mono{font:500 12px ui-monospace,Menlo,monospace;color:var(--c-muted);word-break:break-all}
+.note{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--c-accent) 18%,transparent);border:1px solid color-mix(in srgb,var(--c-accent) 55%,transparent);font-size:13px}
+.err{color:var(--c-danger);font-weight:700;font-size:13px;min-height:20px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat{background:var(--c-bg);border-radius:12px;padding:12px}.stat b{display:block;font:800 26px var(--font-display)}
+.pill{display:inline-flex;gap:7px;align-items:center;padding:6px 12px;border-radius:99px;font:700 11px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}
+.pill.on{background:color-mix(in srgb,var(--c-ok) 16%,transparent);color:var(--c-ok)}
+.pill.off{background:color-mix(in srgb,var(--c-danger) 12%,transparent);color:var(--c-danger)}
+.pill:before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.steps{display:flex;gap:6px;margin:0 0 22px}.steps i{flex:1;height:5px;border-radius:9px;background:var(--c-line)}.steps i.on{background:var(--c-primary)}
+fieldset{border:0;padding:0;margin:0;display:none}fieldset.on{display:block}
+.tog{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1.5px solid var(--c-line);border-radius:12px;background:var(--c-bg);font-weight:600;font-size:14px}
+.tile{background:var(--c-bg);border-radius:12px;padding:13px}.tile b{display:block;margin-top:3px}
+.contact{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--c-line)}
+.contact:first-of-type{border-top:0}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--c-dark);color:var(--c-on-dark);padding:12px 20px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#sheet{display:none}
+@media print{#app,#toast{display:none!important}body{background:#fff;padding:0}#sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:8mm;padding:10mm;color:#000}
+.st{border:1px dashed #999;padding:4mm;text-align:center;font:700 10pt sans-serif;break-inside:avoid}.st svg{width:40mm;height:40mm}.st small{display:block;font-weight:400;font-size:8pt}}
+body.static .srv{display:none!important}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="sheet"></div><div id="toast" role="status"></div>
+<script src="vendor/qrcode.js"></script>
+<script>
+const BRAND={name:'QR Runner',org:'JA Pernambuco',sos:'192'}; // textos da marca
+document.title=`${BRAND.name} · ${BRAND.org}`;
+const $=s=>document.querySelector(s),app=$('#app');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ini=n=>n.trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+const digits=s=>String(s||'').replace(/\D/g,'');
+const wa=p=>{const d=digits(p);return d.startsWith('55')&&d.length>11?d:'55'+d};
+let S=null;try{S=JSON.parse(localStorage.getItem('qrr')||'null')}catch{}
+const setS=v=>{S=v;try{v?localStorage.setItem('qrr',JSON.stringify(v)):localStorage.removeItem('qrr')}catch{}};
+const STATIC=true;document.body.classList.add('static');
+const FL=['name','nickname','city','group','c1Name','c1Phone','c2Name','c2Phone','msg','allergies','blood','conditions','meds','plan'],MED=['allergies','blood','conditions','meds','plan'];
+const b64e=t=>btoa(unescape(encodeURIComponent(t))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const b64d=t=>decodeURIComponent(escape(atob(t.replace(/-/g,'+').replace(/_/g,'/'))));
+const pack=d=>b64e(JSON.stringify([...FL.map(k=>d[k]||''),d.showMed?1:0]));
+const unpack=t=>{const a=JSON.parse(b64d(t)),d={};FL.forEach((k,i)=>d[k]=a[i]||'');d.showMed=a[FL.length]===1;return d};
+const ld=()=>{try{return JSON.parse(localStorage.getItem('qrr-static')||'null')}catch{return null}};
+const sv=d=>{try{localStorage.setItem('qrr-static',JSON.stringify(d))}catch{}};
+const fail=(m,st=400)=>{throw Object.assign(new Error(m),{status:st})};
+function check(b){const d={};FL.forEach(k=>d[k]=String(b[k]||'').trim());d.showMed=b.showMed===true;
+ if(!d.name)fail('Informe seu nome.');if(d.c1Phone.replace(/\D/g,'').length<8||!d.c1Name)fail('Informe nome e telefone do contato principal.');if(b.consent!==true)fail('É preciso aceitar o termo de consentimento.');
+ try{const q=qrcode(0,'M');q.addData(shortUrl(pack(d)));q.make()}catch{fail('Informações demais para caber no QR. Encurte a mensagem ou os campos.')}return d}
+async function api(p,o={}){const m=o.method||'GET';
+ if(p==='/api/profiles'&&m==='POST'){const d=check(o.body);sv(d);return{code:pack(d),key:'local'}}
+ if(p.startsWith('/api/p/')){try{const d=unpack(decodeURIComponent(p.slice(7).split('?')[0]));if(!d.name)throw 0;const has=MED.some(f=>d[f]);if(!d.showMed)MED.forEach(f=>delete d[f]);return{active:true,hasMedical:has&&d.showMed,...d}}catch{fail('Perfil não encontrado.',404)}}
+ const d=ld();if(!d)fail('Sem perfil.',404);
+ if(m==='GET')return{code:pack(d),active:true,scans:0,lastScan:null,...d};
+ if(m==='PUT'){const n=check(o.body);sv(n);setS({code:pack(n),key:'local'});return{code:pack(n),active:true,scans:0,...n}}
+ if(m==='DELETE'){try{localStorage.removeItem('qrr-static')}catch{}return{ok:true}}
+ fail('Não disponível.')}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2400)}
+const copy=async(t,m='Copiado')=>{try{await navigator.clipboard.writeText(t);toast(m)}catch{prompt('Copie:',t)}};
+const head=(r='')=>`<header class="top"><a class="brand" href="./"><img src="logo.svg" alt="" width="40" height="40"><span>${esc(BRAND.name)}<small>${esc(BRAND.org)}</small></span></a>${r}</header>`;
+const shortUrl=c=>location.href.split('#')[0].split('?')[0]+'#/p/'+c;
+function makeQR(c){const q=qrcode(0,'M');q.addData(shortUrl(c));q.make();return q}
+function qrSvg(q){const n=q.getModuleCount(),m=2,s=n+2*m;let d='';for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
+ return `<svg viewBox="0 0 ${s} ${s}" shape-rendering="crispEdges" role="img" aria-label="QR Code do perfil"><rect width="${s}" height="${s}" fill="#faf7ef"/><path d="${d}" fill="#17233d"/></svg>`}
+function qrPng(q,name){const n=q.getModuleCount(),m=2,z=Math.ceil(1000/(n+2*m)),s=(n+2*m)*z,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#faf7ef';x.fillRect(0,0,s,s);x.fillStyle='#17233d';
+ for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect((k+m)*z,(r+m)*z,z,z);const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`qr-${(name||'perfil').toLowerCase().replace(/\W+/g,'-')}.png`;document.body.appendChild(a);a.click();a.remove()}
+
+/* ---------- DONO: painel ---------- */
+function dashboard(p){
+  const q=makeQR(p.code),url=shortUrl(p.code),last=p.lastScan?new Date(p.lastScan).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'nunca';
+  app.innerHTML=`<div class="wrap">${head('<button class="btn" id="ed">Editar perfil</button>')}
+  <div class="eyebrow p">Bom treino, ${esc(p.nickname||p.name.split(' ')[0])}</div>
+  <h1 style="font-size:clamp(34px,7vw,52px);margin:10px 0 22px">Sua segurança<br><span style="color:var(--c-primary)">vai com você.</span></h1>
+  <div class="dark" style="padding:26px"><div class="row" style="justify-content:space-between;align-items:flex-start"><div class="row"><div class="av">${esc(ini(p.name))}</div><div><h2 style="font-size:26px">${esc(p.name)}</h2><div style="opacity:.7;font-size:14px;margin-top:4px">${p.nickname?'“'+esc(p.nickname)+'” · ':''}${esc(p.city)}</div></div></div><span class="pill ${p.active?'on':'off'}" style="background:#fff;">${p.active?'Ativo':'Pausado'}</span></div></div>
+  <div class="grid g2" style="margin-top:18px">
+   <div class="grid"><div class="card"><div class="eyebrow">Central de segurança</div>
+    <div class="acts"><a class="btn p" href="${url}" target="_blank" rel="noopener">Ver como o público vê</a><button class="btn" id="cp">Copiar link público</button><button class="btn" id="dl">Baixar QR (PNG)</button><button class="btn" id="pr">Imprimir adesivos</button></div></div>
+   <div class="card srv"><div class="eyebrow">Disponibilidade</div><h3 style="font-size:20px;margin:8px 0">${p.active?'Seu QR está pronto para ajudar.':'Seu QR está pausado.'}</h3><p style="color:var(--c-muted);font-size:14px;margin:0 0 14px">${p.active?'Quem escanear vê o que você escolheu compartilhar.':'Enquanto pausado, o QR não mostra nenhum dado pessoal.'}</p><button class="btn ${p.active?'d':'p'}" id="tg">${p.active?'Pausar QR':'Reativar QR'}</button></div>
+   <div class="card"><div class="eyebrow">Avançado</div><p class="srv" style="color:var(--c-muted);font-size:14px">Guarde o <b>link de acesso</b> para gerenciar o perfil em outro aparelho. Quem tiver este link consegue editá-lo.</p>
+    <div class="acts"><button class="btn srv" id="ak">Copiar link de acesso</button><button class="btn srv" id="rt">Trocar código do QR</button><button class="btn d full" id="rm" style="grid-column:1/-1">Excluir perfil e dados</button></div></div></div>
+   <div class="card" style="text-align:center;align-self:start"><div class="eyebrow" style="text-align:left">Seu código pessoal</div><h2 style="font-size:24px;text-align:left;margin-top:8px">Pronto para<br>colar na pouch.</h2>
+    <div class="qrbox">${qrSvg(q)}</div><p class="mono" style="margin:14px 0 0">${esc(url.length>70?url.slice(0,56)+'…':url)}</p>
+    <div class="stats srv" style="text-align:left"><div class="stat"><span class="eyebrow">Leituras</span><b>${p.scans}</b></div><div class="stat"><span class="eyebrow">Última</span><b style="font-size:15px;padding-top:8px">${last}</b></div></div>
+    <p class="note" style="margin:14px 0 0;text-align:left">Neste modo os dados ficam dentro do próprio QR. Se você editar o perfil, o QR muda: imprima o novo.</p></div></div></div>`;
+  $('#ed').onclick=()=>form(p);
+  $('#cp').onclick=()=>copy(url,'Link copiado');
+  $('#dl').onclick=()=>qrPng(q,p.nickname||p.name);
+  $('#pr').onclick=()=>{$('#sheet').innerHTML=Array(6).fill(`<div class="st">${qrSvg(q)}Em emergência, escaneie<small>${esc(BRAND.name)} · ${esc(BRAND.org)}</small></div>`).join('');print()};
+  $('#ak').onclick=()=>copy(`${location.origin}/#a=${S.code}.${S.key}`,'Link de acesso copiado');
+  $('#tg').onclick=async()=>{try{dashboard(await api(`/api/profiles/${p.code}/active`,{method:'POST',body:{active:!p.active}}))}catch(e){toast(e.message)}};
+  $('#rt').onclick=async()=>{if(!confirm('O QR atual vai parar de funcionar. Você já tem como imprimir o novo?'))return;try{const r=await api(`/api/profiles/${p.code}/rotate`,{method:'POST'});setS({...S,code:r.code});boot()}catch(e){toast(e.message)}};
+  $('#rm').onclick=async()=>{if(!confirm('Excluir seu perfil e todos os dados? Os QRs impressos deixarão de funcionar.'))return;try{await api(`/api/profiles/${p.code}`,{method:'DELETE'});setS(null);boot()}catch(e){toast(e.message)}};
+}
+
+/* ---------- DONO: formulário em 3 passos ---------- */
+function form(p){
+  const v=p||{showMed:true},f=k=>esc(v[k]||''),isNew=!p;let step=0;
+  app.innerHTML=`<div class="wrap" style="max-width:720px">${head(isNew?'':'<button class="btn" id="cn">Cancelar</button>')}
+  <div class="eyebrow p">${isNew?'Primeiro passo':'Editar informações'}</div><h1 style="font-size:clamp(30px,6vw,44px);margin:8px 0 20px">${isNew?'Monte sua safety card.':'Seu perfil, do seu jeito.'}</h1>
+  <div class="steps" id="st"><i></i><i></i><i></i></div>
+  <form id="f" class="card" novalidate>
+   <fieldset><h2 style="font-size:22px;margin-bottom:6px">Sobre você</h2><p style="color:var(--c-muted);margin:0 0 16px;font-size:14px">Ajuda seu grupo e quem te socorrer a te reconhecer.</p><div class="f2">
+    <label class="full">Nome completo<input name="name" required maxlength="60" autocomplete="name" value="${f('name')}" placeholder="Como podemos te chamar?"></label>
+    <label>Apelido <small>opcional</small><input name="nickname" maxlength="20" value="${f('nickname')}" placeholder="Ex.: Naná"></label>
+    <label>Cidade<input name="city" maxlength="40" value="${f('city')}" placeholder="Ex.: Recife, PE"></label>
+    <label class="full">Grupo de corrida <small>opcional</small><input name="group" maxlength="40" value="${f('group')}" placeholder="Onde você corre?"></label></div></fieldset>
+   <fieldset><h2 style="font-size:22px;margin-bottom:6px">Em uma emergência</h2><p style="color:var(--c-muted);margin:0 0 16px;font-size:14px">Quem deve ser avisado? Um segundo contato ajuda se o primeiro não atender.</p><div class="f2">
+    <label>Contato principal<input name="c1Name" required maxlength="50" value="${f('c1Name')}" placeholder="Nome e sobrenome"></label>
+    <label>Telefone<input name="c1Phone" required type="tel" inputmode="tel" maxlength="20" value="${f('c1Phone')}" placeholder="(81) 99999-9999"></label>
+    <label>Segundo contato <small>opcional</small><input name="c2Name" maxlength="50" value="${f('c2Name')}"></label>
+    <label>Telefone<input name="c2Phone" type="tel" inputmode="tel" maxlength="20" value="${f('c2Phone')}" placeholder="(81) 99999-9999"></label>
+    <label class="full">Mensagem para quem ajudar <small>opcional</small><textarea name="msg" rows="3" maxlength="200" placeholder="Ex.: Sou a Mariana, irmã da Ana. Pode me ligar.">${f('msg')}</textarea></label></div></fieldset>
+   <fieldset><h2 style="font-size:22px;margin-bottom:6px">Saúde e privacidade</h2><p style="color:var(--c-muted);margin:0 0 16px;font-size:14px">Tudo opcional. Estas informações ficam escondidas atrás de um botão na página pública.</p>
+    <label class="tog"><input type="checkbox" name="showMed" id="sm" ${v.showMed?'checked':''}><span>Mostrar informações de saúde para quem escanear</span></label>
+    <div class="f2" style="margin-top:14px"><label>Alergias<input name="allergies" maxlength="100" value="${f('allergies')}" placeholder="Ex.: dipirona"></label>
+    <label>Tipo sanguíneo<select name="blood"><option value="">Não informar</option>${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(t=>`<option ${v.blood===t?'selected':''}>${t}</option>`).join('')}</select></label>
+    <label class="full">Condições importantes<input name="conditions" maxlength="120" value="${f('conditions')}" placeholder="Ex.: asma, diabetes, epilepsia"></label>
+    <label>Medicamentos contínuos<input name="meds" maxlength="100" value="${f('meds')}" placeholder="Ou escreva “Nenhum”"></label>
+    <label>Plano de saúde<input name="plan" maxlength="60" value="${f('plan')}" placeholder="Operadora e carteirinha"></label></div>
+    <label class="tog" style="margin-top:16px"><input type="checkbox" name="consent" required><span>Autorizo o uso destes dados para exibição em emergências, ciente de que são dados sensíveis (LGPD) e que posso pausar ou excluir quando quiser.</span></label></fieldset>
+   <div class="err" id="er" role="alert"></div>
+   <div class="row" style="justify-content:space-between;margin-top:8px"><button type="button" class="btn" id="bk">Voltar</button><button class="btn p big" id="nx"></button></div></form></div>`;
+  const fs=[...app.querySelectorAll('fieldset')],er=$('#er');
+  const med=()=>['allergies','blood','conditions','meds','plan'].forEach(n=>app.querySelector(`[name=${n}]`).disabled=!$('#sm').checked);
+  function show(){fs.forEach((x,i)=>x.classList.toggle('on',i===step));[...$('#st').children].forEach((x,i)=>x.classList.toggle('on',i<=step));
+   $('#bk').style.visibility=step||!isNew?'visible':'hidden';$('#nx').textContent=step<2?'Continuar →':(isNew?'Criar meu perfil':'Salvar alterações');er.textContent='';scrollTo(0,0)}
+  $('#sm').onchange=med;med();show();if($('#cn'))$('#cn').onclick=boot;
+  $('#bk').onclick=()=>step?(step--,show()):boot();
+  $('#f').onsubmit=async e=>{e.preventDefault();
+   const bad=[...fs[step].querySelectorAll('input,select')].find(i=>!i.disabled&&!i.checkValidity());
+   if(bad){bad.reportValidity();return}
+   if(step<2){step++;show();return}
+   const d=Object.fromEntries(new FormData(e.target));d.showMed=$('#sm').checked;d.consent=e.target.querySelector('[name=consent]').checked;
+   const b=$('#nx');b.disabled=true;
+   try{if(isNew){const r=await api('/api/profiles',{method:'POST',body:d});setS(r)}else await api(`/api/profiles/${S.code}`,{method:'PUT',body:d});toast('Perfil salvo');boot()}
+   catch(x){er.textContent=x.message;b.disabled=false}};
+}
+
+/* ---------- PÚBLICO: quem escaneia ---------- */
+async function publicView(code){
+  app.innerHTML=`<div class="wrap" style="max-width:680px">${head(`<span class="eyebrow">Perfil de emergência</span>`)}<p class="eyebrow" style="text-align:center;padding:40px 0">Carregando…</p></div>`;
+  let p;try{p=await api(`/api/p/${code}${location.search.includes('noscan')?'?noscan':''}`)}catch(e){return msg('⚠️','Código não encontrado','Não encontramos este perfil.','O código pode ter sido substituído ou digitado incorretamente.')}
+  if(!p.active)return msg('⏸️','Perfil pausado','Este QR está em pausa.','A pessoa desativou o perfil temporariamente. Nenhum dado é exibido. Em emergência, ligue '+BRAND.sos+'.',true);
+  const cs=[[p.c1Name,p.c1Phone],[p.c2Name,p.c2Phone]].filter(c=>c[0]&&digits(c[1]));
+  app.innerHTML=`<div class="wrap" style="max-width:680px">${head(`<span class="eyebrow">Perfil de emergência</span>`)}
+  <a class="btn sos" href="tel:${BRAND.sos}">🚑 Ligar para o SAMU (${BRAND.sos})</a>
+  <section class="dark" style="margin-top:16px;padding:26px"><div class="row"><div class="av" style="width:72px;height:72px">${esc(ini(p.name))}</div><div><div class="eyebrow" style="color:var(--c-accent)">Pessoa identificada</div><h1 style="font-size:30px;margin-top:4px">${esc(p.name)}</h1><div style="opacity:.7;font-size:14px;margin-top:4px">${esc(p.city||'Pernambuco')}${p.group?' · '+esc(p.group):''}</div></div></div>
+   ${p.msg?`<div style="margin-top:20px;padding:14px;border-radius:14px;background:rgba(255,255,255,.09)"><div class="eyebrow" style="color:var(--c-accent)">Mensagem</div><p style="margin:8px 0 0">${esc(p.msg)}</p></div>`:''}</section>
+  <section class="card" style="margin-top:16px"><div class="eyebrow">Contatos de emergência</div>
+   ${cs.map(([n,t])=>`<div class="contact"><div><b style="font:800 20px var(--font-display)">${esc(n)}</b><div class="mono">${esc(t)}</div></div><div class="row" style="gap:8px"><a class="btn p" href="tel:+${wa(t)}">📞 Ligar</a><a class="btn" href="sms:+${wa(t)}">💬 SMS</a></div></div>`).join('')||'<p>Contato não informado.</p>'}
+   <div id="loc" style="margin-top:6px;border-top:1px solid var(--c-line);padding-top:16px"><button class="btn big" id="lc" style="width:100%">📍 Enviar minha localização ao contato</button><div class="err" id="le"></div></div></section>
+  ${p.hasMedical?`<section class="card" style="margin-top:16px"><button class="btn big" id="mb" style="width:100%">🩺 Ver informações de saúde</button><div id="md" hidden style="margin-top:16px;display:none;gap:10px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">${[['Alergias',p.allergies],['Tipo sanguíneo',p.blood],['Condições',p.conditions],['Medicamentos',p.meds],['Plano de saúde',p.plan]].filter(x=>x[1]).map(([l,t])=>`<div class="tile"><span class="eyebrow">${l}</span><b>${esc(t)}</b></div>`).join('')}</div></section>`:''}
+  <p class="eyebrow" style="text-align:center;margin-top:26px">${esc(BRAND.name)} · ${esc(BRAND.org)} · <a href="./" style="text-decoration:underline">crie o seu</a></p></div>`;
+  if($('#mb'))$('#mb').onclick=()=>{$('#md').style.display='grid';$('#mb').style.display='none'};
+  $('#lc').onclick=()=>{const b=$('#lc');if(!navigator.geolocation){$('#le').textContent='Seu aparelho não permite localização.';return}
+   b.disabled=true;b.textContent='Buscando localização…';
+   navigator.geolocation.getCurrentPosition(pos=>{const m=`https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`,t=encodeURIComponent(`Encontrei o perfil QR Runner de ${p.name} e preciso de ajuda. Localização: ${m}`);
+    $('#loc').innerHTML=`<div class="eyebrow" style="margin-bottom:10px">Enviar para ${esc(cs[0]?.[0]||'o contato')}</div><div class="acts" style="margin:0"><a class="btn p big" href="https://wa.me/${wa(cs[0]?.[1])}?text=${t}">WhatsApp</a><a class="btn big" href="sms:+${wa(cs[0]?.[1])}?&body=${t}">SMS</a></div>`},
+    ()=>{b.disabled=false;b.textContent='📍 Enviar minha localização ao contato';$('#le').textContent='Não foi possível obter a localização. Permita o acesso e tente de novo.'},{enableHighAccuracy:true,timeout:15000})};
+}
+function msg(icon,ey,title,text,samu){app.innerHTML=`<div class="wrap" style="max-width:520px;text-align:center;padding-top:50px"><div class="card"><div style="font-size:42px">${icon}</div><div class="eyebrow p" style="margin-top:14px">${ey}</div><h1 style="font-size:30px;margin:10px 0">${title}</h1><p style="color:var(--c-muted)">${text}</p>${samu?`<a class="btn sos" href="tel:${BRAND.sos}" style="margin-bottom:10px">🚑 Ligar ${BRAND.sos}</a>`:''}<a class="btn p" href="./">Ir para o início</a></div></div>`}
+
+/* ---------- início ---------- */
+async function boot(){
+  const m=location.hash.match(/^#\/p\/([\w-]+)/);if(m)return publicView(m[1]);
+  const a=location.hash.match(/^#a=([a-z0-9]+)\.(.+)$/);if(a){setS({code:a[1],key:a[2]});history.replaceState(null,'','/')}
+  if(!S)return form(null);
+  try{dashboard(await api(`/api/profiles/${S.code}`))}catch(e){if(e.status===401||e.status===404){setS(null);form(null)}else app.innerHTML=`<div class="wrap"><p class="err">${esc(e.message)}</p></div>`}
+}
+addEventListener('hashchange',()=>boot());boot();
+</script>
+</body>
+</html>
