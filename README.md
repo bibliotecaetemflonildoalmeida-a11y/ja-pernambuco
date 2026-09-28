@@ -1,32 +1,30 @@
 # QR Runner · JA Pernambuco
 
-Perfil de emergência em QR Code para quem corre. Sem cadastro, sem backend: os dados ficam no dispositivo e dentro do próprio QR.
+Perfil de emergência em QR Code para corredores. O QR contém apenas um **código curto** (`seusite.com/p/a7k2m3x`); os dados ficam no servidor e podem ser editados, pausados ou apagados sem reimprimir o adesivo.
 
-## Como funciona
-
-1. A pessoa preenche nome, contato de emergência e (opcionalmente) informações médicas.
-2. O app gera um QR Code cujo link já contém os dados do perfil.
-3. Quem escanear vê o contato de emergência e pode ligar ou enviar mensagem.
-
-## Publicar no GitHub Pages
-
-1. Crie um repositório no GitHub e envie estes arquivos para a branch `main`.
-2. Vá em **Settings → Pages**.
-3. Em **Build and deployment**, escolha **Deploy from a branch**, branch `main`, pasta `/ (root)`.
-4. Aguarde um minuto. O site ficará em `https://SEU-USUARIO.github.io/NOME-DO-REPO/`.
-
-> Gere e imprima os QR Codes **depois** de publicar, pelo endereço final. O QR usa o endereço em que a página está aberta.
+## O que tem
+- Página pública para quem escaneia: botão SAMU (192), até 2 contatos com ligar/SMS, envio de localização por WhatsApp/SMS, informações de saúde atrás de um botão.
+- Painel do dono: criação em 3 passos, edição, pausar QR, trocar código, excluir dados, contagem de leituras, baixar QR (PNG, correção de erro nível H) e folha de adesivos para impressão.
+- Sem contas: o dono recebe uma chave secreta guardada no navegador. O "link de acesso" permite gerenciar em outro aparelho.
+- Consentimento LGPD no cadastro; a chave é guardada só como hash no banco.
 
 ## Rodar localmente
+Requer Node 22.13+ (sem `npm install`, nenhuma dependência).
 
-Abra `index.html` no navegador (ou `python3 -m http.server`).
+    npm start        # http://localhost:3000
 
-## Limitações
+## Trocar paleta, fontes e logo
+- Cores, fontes e raio: **`public/brand.css`** (uma lista de variáveis).
+- Logo: substitua **`public/logo.svg`** (e `favicon.svg`).
+- Nome da marca e número de emergência: constante `BRAND` no início do `<script>` de `public/index.html`.
+- O QR é sempre escuro sobre fundo claro de propósito, para leitura confiável.
 
-- Editar o perfil muda o QR. QRs antigos continuam mostrando os dados antigos.
-- Não é possível desativar um QR já impresso, pois os dados estão dentro dele.
-- Quem tiver o QR vê tudo que foi preenchido: compartilhe só o essencial.
+## Publicar (o GitHub Pages NÃO serve, pois há servidor)
+Suba o repositório no GitHub e conecte a um host que rode Node/Docker: Render (`render.yaml` incluso), Railway, Fly.io etc.
+- Variáveis: `PORT` (automática) e `DATA_DIR` (pasta do banco SQLite).
+- **O banco precisa de disco persistente**, senão os perfis somem a cada deploy. No Render isso exige plano pago; no Fly/Railway use um volume.
+- Use HTTPS (os hosts acima já entregam). A localização só funciona em HTTPS.
+- Gere e imprima os QRs **somente pelo domínio final**.
 
-## Tecnologia
-
-HTML, CSS e JavaScript puros, mais [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) via cdnjs.
+## Antes de distribuir em escala
+Faça backup periódico do arquivo `qrrunner.db`, publique uma política de privacidade e teste os adesivos impressos em vários celulares (iPhone e Android), com suor e sol.

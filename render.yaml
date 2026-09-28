@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: qr-runner
+    runtime: docker
+    plan: starter        # disco persistente exige plano pago
+    healthCheckPath: /health
+    disk:
+      name: dados
+      mountPath: /data
+      sizeGB: 1

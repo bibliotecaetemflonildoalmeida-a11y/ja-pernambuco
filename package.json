@@ -1,0 +1,9 @@
+{
+  "name": "qr-runner",
+  "version": "1.0.0",
+  "description": "Perfil de emergência em QR Code para corredores — JA Pernambuco",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=22.13" },
+  "scripts": { "start": "node --disable-warning=ExperimentalWarning server.js", "dev": "node --disable-warning=ExperimentalWarning --watch server.js" }
+}
