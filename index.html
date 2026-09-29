@@ -4,18 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>QR Runner · JA Pernambuco</title>
-<!-- Paleta: edite as variáveis no topo do CSS (:root). Logo: troque o ⚡ dentro de .logo i. -->
-<meta name="description" content="Perfil de emergência em QR Code para quem corre. Sem cadastro, os dados ficam no seu dispositivo e dentro do próprio QR.">
+<meta name="description" content="Perfil de emergência em QR Code para quem corre. Conta própria, QR único que nunca muda.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f7f2e8;--card:#fdfaf3;--fg:#1a2238;--bd:#dfd6c4;--pri:#e4501a;--sec:#1f2f57;--secfg:#fdfaf3;--acc:#f9c823;--mut:#65708c;--ok:#2f7a55;--bad:#c62f26;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#f7f2e8;--card:#fdfaf3;--fg:#1a2238;--bd:#dfd6c4;--pri:#e4501a;--sec:#1f2f57;--secfg:#fdfaf3;--acc:#f9c823;--mut:#65708c;--ok:#2f7a55;--bad:#c62f26}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10152a;--card:#182040;--fg:#f7f2e8;--bd:#2b3562;--sec:#243766;--mut:#9aa5c4;--ok:#6fcf9b}}
 :root[data-theme="dark"]{--bg:#10152a;--card:#182040;--fg:#f7f2e8;--bd:#2b3562;--sec:#243766;--mut:#9aa5c4;--ok:#6fcf9b}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:400 15px/1.5 Manrope,system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 15px/1.5 Manrope,system-ui,sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 h1,h2,h3{font-family:Syne,Manrope,sans-serif;margin:0;letter-spacing:-.02em;line-height:1.05}
 .mono{font:500 10px/1.4 'DM Mono',ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
 a{color:inherit;text-decoration:none}
@@ -37,13 +35,24 @@ label{display:block;font-size:12px;font-weight:700}
 input,select,textarea{width:100%;margin-top:6px;padding:12px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--fg);font:inherit;font-size:15px}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:1px}
 input:disabled,select:disabled{opacity:.45}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--fg);font:700 13px Manrope,sans-serif;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--fg);font:700 13px Manrope,sans-serif;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .15s}
 .btn:hover{border-color:var(--pri)}
 .btn.p{background:var(--pri);border-color:var(--pri);color:#fff;box-shadow:3px 3px 0 var(--acc)}
+.btn.p:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--acc)}
+.btn:active{transform:translate(2px,2px)}
+.btn.p:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--acc)}
+.btn.p.ring{animation:ring 2.2s ease-out infinite}
+@keyframes ring{0%{box-shadow:3px 3px 0 var(--acc),0 0 0 0 color-mix(in srgb,var(--pri) 55%,transparent)}70%,100%{box-shadow:3px 3px 0 var(--acc),0 0 0 16px transparent}}
 .btn.d{color:var(--bad);border-color:rgba(198,47,38,.35)}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-.qrbox{background:#faf7ef;border-radius:18px;padding:8px;width:min(100%,300px);margin:16px auto 0;border:1px solid var(--bd)}
+.qrbox{background:#faf7ef;border-radius:18px;padding:8px;width:min(100%,300px);margin:16px auto 0;border:1px solid var(--bd);position:relative;overflow:visible}
 .qrbox svg{display:block;width:100%;height:auto}
+.qrbox:before,.qrbox:after{content:"";position:absolute;width:34px;height:34px;border:5px solid var(--pri);pointer-events:none}
+.qrbox:before{left:-8px;top:-8px;border-right:0;border-bottom:0;border-radius:14px 0 0 0}
+.qrbox:after{right:-8px;bottom:-8px;border-left:0;border-top:0;border-radius:0 0 14px 0}
+.scan{position:absolute;left:10px;right:10px;top:8%;height:3px;border-radius:3px;background:var(--pri);box-shadow:0 0 12px 2px var(--pri);opacity:0;animation:sweep 1.5s ease-in-out 1s 2}
+.qrbox:hover .scan{animation:sweep 1.5s ease-in-out infinite}
+@keyframes sweep{0%{top:6%;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:92%;opacity:0}}
 .link{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--bg);font:400 10px 'DM Mono',monospace;word-break:break-all;color:var(--mut);max-height:64px;overflow:hidden}
 .info{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
 .tile{background:var(--bg);border-radius:12px;padding:12px}
@@ -52,12 +61,10 @@ input:disabled,select:disabled{opacity:.45}
 .ok{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(47,122,85,.13);border:1px solid rgba(47,122,85,.35);color:var(--ok);font-weight:800;font-size:13px;margin-bottom:16px}
 .tog{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
 .tog input{width:auto;margin:4px 0 0;transform:scale(1.5)}
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--sec);color:var(--secfg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--sec);color:var(--secfg);padding:11px 18px;border-radius:999px;font-weight:700;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:9;max-width:90vw;text-align:center}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 #sheet{display:none}
 @media print{#app,#toast{display:none!important}#sheet{display:block;text-align:center;padding:40px;color:#000}#sheet svg{width:340px;height:340px}body{background:#fff}}
-
-/* ===== TCHAN: número de peito, radar do QR, prontidão, confete ===== */
 body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:repeating-radial-gradient(circle at 108% -8%,transparent 0 26px,color-mix(in srgb,var(--pri) 9%,transparent) 26px 28px)}
 .bib{position:relative;background:var(--card);color:var(--fg);border:2px solid var(--fg);border-radius:20px;overflow:hidden;box-shadow:6px 6px 0 var(--pri);transform:rotate(-.6deg);animation:drop .8s cubic-bezier(.2,1.5,.4,1) both}
 .pin{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--fg);z-index:2}
@@ -73,19 +80,6 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .bar{height:10px;margin-top:10px;border-radius:9px;background:var(--bd);overflow:hidden}
 .bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--pri),var(--acc));animation:grow 1.1s .3s cubic-bezier(.2,.8,.2,1) both}
 @keyframes grow{from{width:0!important}}
-.qrbox{position:relative;overflow:visible}
-.qrbox:before,.qrbox:after{content:"";position:absolute;width:34px;height:34px;border:5px solid var(--pri);pointer-events:none}
-.qrbox:before{left:-8px;top:-8px;border-right:0;border-bottom:0;border-radius:14px 0 0 0}
-.qrbox:after{right:-8px;bottom:-8px;border-left:0;border-top:0;border-radius:0 0 14px 0}
-.scan{position:absolute;left:10px;right:10px;top:8%;height:3px;border-radius:3px;background:var(--pri);box-shadow:0 0 12px 2px var(--pri);opacity:0;animation:sweep 1.5s ease-in-out 1s 2}
-.qrbox:hover .scan{animation:sweep 1.5s ease-in-out infinite}
-@keyframes sweep{0%{top:6%;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:92%;opacity:0}}
-.btn{transition:transform .12s,box-shadow .12s,border-color .15s}
-.btn:active{transform:translate(2px,2px)}
-.btn.p:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--acc)}
-.btn.p:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--acc)}
-.btn.p.ring{animation:ring 2.2s ease-out infinite}
-@keyframes ring{0%{box-shadow:3px 3px 0 var(--acc),0 0 0 0 color-mix(in srgb,var(--pri) 55%,transparent)}70%,100%{box-shadow:3px 3px 0 var(--acc),0 0 0 16px transparent}}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.bib{transform:none}.scan{display:none}}
 .qrs{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 16px;margin:0 -4px 4px;scrollbar-width:thin}
 .qchip{flex:none;display:flex;align-items:center;gap:9px;min-height:46px;padding:0 16px 0 6px;border-radius:99px;border:1.5px solid var(--bd);background:var(--card);color:var(--fg);font:700 13px Manrope,sans-serif;cursor:pointer;transition:transform .12s,border-color .15s}
@@ -93,6 +87,10 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .qchip.on{border-color:var(--pri);box-shadow:3px 3px 0 var(--acc)}
 .qchip.add{padding:0 18px;border-style:dashed;color:var(--pri)}
 .qchip:hover{border-color:var(--pri)}.qchip:active{transform:translate(2px,2px)}
+.empty{text-align:center;padding:44px 24px}
+.empty .av{margin:0 auto 18px;width:80px;height:80px;font-size:26px}
+.loading{text-align:center;padding:70px 0;color:var(--mut);font:500 12px 'DM Mono',monospace;letter-spacing:.16em;text-transform:uppercase}
+.who{font-size:12px;color:var(--mut);margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -100,68 +98,207 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 <div id="sheet"></div>
 <div id="toast" role="status"></div>
 <script>
+/* ===================== CONFIG ===================== */
+const SUPABASE_URL='https://cwxcqfnwnosbvdshizwj.supabase.co';
+const SUPABASE_KEY='sb_publishable_SNxt31cnZVXc7uuYFhNo1w_6tLmhG4q';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+/* ===================== HELPERS ===================== */
 const $=s=>document.querySelector(s),app=$('#app');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const K='qr-runner-ja-v3',OLD='qr-runner-ja-v2';let mem=null;
-const uid=()=>Math.random().toString(36).slice(2,8);
-const rd=k=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}};
-function state(){let t=rd(K)||mem;if(!t){const o=rd(OLD);t=o&&o.name?{active:'a',list:[{...o,id:'a'}]}:{active:null,list:[]}}
- if(!t.list.some(x=>x.id===t.active))t.active=t.list[0]?t.list[0].id:null;mem=t;return t}
-const persist=t=>{mem=t;try{localStorage.setItem(K,JSON.stringify(t))}catch{}};
-const load=()=>{const t=state();return t.list.find(x=>x.id===t.active)||null};
-const setActive=id=>{const t=state();t.active=id;persist(t)};
-const upsert=o=>{const t=state(),i=t.list.findIndex(x=>x.id===o.id);i<0?t.list.push(o):t.list[i]=o;t.active=o.id;persist(t)};
-const removeP=id=>{const t=state();t.list=t.list.filter(x=>x.id!==id);t.active=t.list[0]?t.list[0].id:null;persist(t)};
+let session=null,booted=false;
 const F=['name','nickname','city','group','initials','cName','cPhone','allergies','blood','meds','msg','showMed'];
-const b64e=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-const b64d=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
-const enc=p=>b64e(JSON.stringify(F.map(k=>k==='showMed'?(p.showMed?1:0):(p[k]||''))));
-const dec=s=>{try{const a=JSON.parse(b64d(s));if(!Array.isArray(a)||!a[0])return null;const p={};F.forEach((k,i)=>p[k]=a[i]);p.showMed=a[11]===1;return p}catch{return null}};
-const link=p=>location.href.split('#')[0]+'#/e/'+enc(p);
-const initials=n=>n.trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+const initials=n=>(n||'').trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+
+const novoPublicId=()=>{
+  try{return crypto.randomUUID().replace(/-/g,'').slice(0,12)}catch{}
+  return Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,8);
+};
+const link=p=>location.href.split('#')[0]+'#/e/'+p.public_id;
 const bibNo=p=>{let h=0;for(const c of (p.name||'')+(p.cPhone||''))h=(h*31+c.charCodeAt(0))>>>0;return String(h%9000+1000)};
-function ready(p){const it=[['sua cidade',p.city],['mensagem para quem ajudar',p.msg],['grupo de corrida',p.group],['informações de saúde',p.showMed&&(p.allergies||p.blood||p.meds)],['nome e telefone do contato',p.cName&&p.cPhone],['seu nome',p.name]],miss=it.filter(x=>!x[1]).map(x=>x[0]),pc=Math.round((it.length-miss.length)/it.length*100);
- return `<div class="ready"><div class="ready-top"><b>Perfil ${pc}% pronto</b><span>${miss.length?'Falta: '+esc(miss.slice(0,2).join(', ')):'Tudo certo. Bom treino!'}</span></div><div class="bar"><i style="width:${pc}%"></i></div></div>`}
+
+const toDb=p=>({
+  label:p.label||null,name:p.name||null,nickname:p.nickname||null,city:p.city||null,
+  "group":p.group||null,initials:p.initials||null,c_name:p.cName||null,c_phone:p.cPhone||null,
+  allergies:p.allergies||null,blood:p.blood||null,meds:p.meds||null,msg:p.msg||null,
+  show_med:!!p.showMed
+});
+const fromDb=r=>({
+  id:r.id,public_id:r.public_id,label:r.label,name:r.name,nickname:r.nickname,city:r.city,
+  group:r.group,initials:r.initials,cName:r.c_name,cPhone:r.c_phone,allergies:r.allergies,
+  blood:r.blood,meds:r.meds,msg:r.msg,showMed:r.show_med
+});
+
+/* ===================== UI UTILS ===================== */
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
+const loading=(m='Carregando…')=>{app.innerHTML=`<div class="wrap"><div class="loading">${esc(m)}</div></div>`};
 function confetti(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const c=document.createElement('canvas'),x=c.getContext&&c.getContext('2d');if(!x)return;
  c.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99';c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);
  const cs=getComputedStyle(document.documentElement),cols=['--pri','--acc','--sec'].map(v=>cs.getPropertyValue(v).trim()||'#e4501a');
  const ps=Array.from({length:120},()=>({x:c.width/2,y:c.height*.35,vx:(Math.random()-.5)*17,vy:-Math.random()*15-4,r:Math.random()*6,s:6+Math.random()*7,col:cols[Math.random()*3|0]}));let t=0;
  (function f(){x.clearRect(0,0,c.width,c.height);ps.forEach(q=>{q.vy+=.32;q.x+=q.vx;q.y+=q.vy;q.r+=.2;x.save();x.translate(q.x,q.y);x.rotate(q.r);x.fillStyle=q.col;x.fillRect(-q.s/2,-q.s/4,q.s,q.s/2);x.restore()});if(++t<120)requestAnimationFrame(f);else c.remove()})()}
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
 function makeQR(text){try{const q=qrcode(0,'M');q.addData(text);q.make();return q}catch{return null}}
 function qrSvg(q){const n=q.getModuleCount(),m=2;let d='';for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;const s=n+2*m;return `<svg viewBox="0 0 ${s} ${s}" shape-rendering="crispEdges" role="img" aria-label="QR Code"><rect width="${s}" height="${s}" fill="#faf7ef"/><path d="${d}" fill="#17233d"/></svg>`}
 function qrPng(q,name){const n=q.getModuleCount(),m=2,z=Math.ceil(1000/(n+2*m)),s=(n+2*m)*z,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#faf7ef';x.fillRect(0,0,s,s);x.fillStyle='#17233d';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect((k+m)*z,(r+m)*z,z,z);const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`qr-runner-${(name||'perfil').toLowerCase().replace(/\W+/g,'-')}.png`;document.body.appendChild(a);a.click();a.remove()}
 const head=(right='')=>`<header class="top"><a class="logo" href="#/"><i>⚡</i><span>QR Runner<small>JA Pernambuco</small></span></a>${right}</header>`;
+const headAuth=(right='')=>head(`<div style="display:flex;gap:8px;align-items:center">${right}<button class="btn" id="logout" title="Sair">Sair</button></div>`);
 
-function chips(p){const l=state().list;return `<div class="qrs" aria-label="Meus QR Codes">${l.map(x=>`<button type="button" class="qchip${x.id===p.id?' on':''}" data-id="${x.id}"><i>${esc(x.initials||initials(x.name))}</i><span>${esc(x.label||x.nickname||x.name.split(' ')[0])}</span></button>`).join('')}<a class="qchip add" href="#/novo">＋ Novo QR</a></div>`}
-function dashboard(p){
+function ready(p){const it=[['sua cidade',p.city],['mensagem para quem ajudar',p.msg],['grupo de corrida',p.group],['informações de saúde',p.showMed&&(p.allergies||p.blood||p.meds)],['nome e telefone do contato',p.cName&&p.cPhone],['seu nome',p.name]],miss=it.filter(x=>!x[1]).map(x=>x[0]),pc=Math.round((it.length-miss.length)/it.length*100);
+ return `<div class="ready"><div class="ready-top"><b>Perfil ${pc}% pronto</b><span>${miss.length?'Falta: '+esc(miss.slice(0,2).join(', ')):'Tudo certo. Bom treino!'}</span></div><div class="bar"><i style="width:${pc}%"></i></div></div>`}
+
+/* ===================== ROUTER ===================== */
+async function route(){
+  const h=location.hash.slice(1)||'/';
+  window.scrollTo(0,0);
+
+  // Rota pública: sempre acessível, sem login
+  if(h.startsWith('/e/')) return publicView(h.slice(3));
+
+  // Rotas protegidas
+  if(!session){
+    if(h!=='/login') return location.replace('#/login');
+    return loginView();
+  }
+  if(h==='/login') return location.replace('#/');
+  if(h==='/novo') return formView(null);
+  if(h.startsWith('/perfil/')) return editView(h.slice(8));
+  if(h.startsWith('/duplicar/')) return duplicateView(h.slice(11));
+  return dashboardView();
+}
+
+/* ===================== AUTH ===================== */
+function loginView(){
+  let mode='login';
+  const render=()=>{
+    const isLogin=mode==='login';
+    app.innerHTML=`<div class="wrap" style="max-width:440px">
+      ${head()}
+      <div class="mono" style="color:var(--pri)">${isLogin?'Bem-vindo de volta':'Primeira vez aqui'}</div>
+      <h1 style="font-size:clamp(30px,6vw,40px);margin:8px 0 22px">${isLogin?'Entre na sua conta.':'Crie sua conta.'}</h1>
+      <form id="lf" class="card">
+        <label>Email<input name="email" type="email" required autocomplete="email" placeholder="voce@exemplo.com"></label>
+        <label style="margin-top:14px;display:block">Senha<input name="password" type="password" required minlength="6" autocomplete="${isLogin?'current-password':'new-password'}" placeholder="Mínimo 6 caracteres"></label>
+        <button class="btn p" style="width:100%;margin-top:16px;min-height:50px" type="submit">${isLogin?'Entrar':'Criar conta'} →</button>
+        <button class="btn" style="width:100%;margin-top:10px" type="button" id="toggle">${isLogin?'Não tem conta? Criar agora':'Já tem conta? Entrar'}</button>
+      </form>
+      <div class="note">Sua conta guarda seus perfis e QRs. Quem escanear o QR vê só o que você preencher — sem precisar de login.</div>
+    </div>`;
+    $('#toggle').onclick=()=>{mode=isLogin?'signup':'login';render()};
+    $('#lf').onsubmit=async e=>{
+      e.preventDefault();
+      const btn=e.target.querySelector('button[type=submit]'),old=btn.textContent;
+      btn.disabled=true;btn.textContent='Aguarde…';
+      const d=new FormData(e.target),email=(d.get('email')||'').toString().trim(),password=(d.get('password')||'').toString();
+      try{
+        if(isLogin){
+          const {error}=await db.auth.signInWithPassword({email,password});
+          if(error)throw error;
+        }else{
+          const {data,error}=await db.auth.signUp({email,password});
+          if(error)throw error;
+          if(!data.session){
+            toast('Confira seu email para confirmar a conta');
+            btn.disabled=false;btn.textContent=old;
+          }
+        }
+      }catch(err){
+        const msg=(err.message||'').toLowerCase();
+        const pt=msg.includes('invalid login')?'Email ou senha incorretos'
+          :msg.includes('already registered')?'Este email já está cadastrado'
+          :msg.includes('password should be')?'Senha muito curta (mínimo 6)'
+          :msg.includes('email')&&msg.includes('valid')?'Email inválido'
+          :err.message||'Erro ao conectar';
+        toast(pt);
+        btn.disabled=false;btn.textContent=old;
+      }
+    };
+  };
+  render();
+}
+
+/* ===================== DASHBOARD ===================== */
+const activeKey=()=>'qr-active-'+session.user.id;
+
+async function dashboardView(){
+  loading('Carregando seus QRs…');
+  const {data,error}=await db.from('profiles').select('*').eq('user_id',session.user.id).order('created_at');
+  if(error)return errorView(error.message);
+
+  const profiles=(data||[]).map(fromDb);
+
+  if(!profiles.length){
+    app.innerHTML=`<div class="wrap" style="max-width:600px">
+      ${headAuth()}
+      <div class="card empty">
+        <div class="av">+</div>
+        <div class="mono" style="color:var(--pri)">Nenhum QR ainda</div>
+        <h1 style="font-size:30px;margin:10px 0 8px">Crie sua safety card.</h1>
+        <p style="color:var(--mut);margin:0 0 22px">Um QR que você cola na pouch, na bike ou dá pra alguém da família.</p>
+        <a class="btn p" href="#/novo" style="min-height:52px">Criar meu primeiro QR →</a>
+      </div>
+      ${await maybeMigrateHTML()}
+    </div>`;
+    bindLogout();bindMigrate();
+    return;
+  }
+
+  // escolhe o ativo
+  let activeId=localStorage.getItem(activeKey());
+  if(!profiles.some(p=>p.id===activeId))activeId=profiles[0].id;
+  localStorage.setItem(activeKey(),activeId);
+  const p=profiles.find(x=>x.id===activeId);
+
   const url=link(p),q=makeQR(url);
-  app.innerHTML=`<div class="wrap">${head('<a class="btn" href="#/perfil">Editar este QR</a>')}${chips(p)}
-  <div class="mono" style="color:var(--pri)">Bom treino, ${esc(p.nickname||p.name.split(' ')[0])}</div>
+
+  app.innerHTML=`<div class="wrap">${headAuth()}
+  <div class="qrs" aria-label="Meus QR Codes">${profiles.map(x=>`<button type="button" class="qchip${x.id===p.id?' on':''}" data-id="${x.id}"><i>${esc(x.initials||initials(x.name))}</i><span>${esc(x.label||x.nickname||(x.name||'').split(' ')[0])}</span></button>`).join('')}<a class="qchip add" href="#/novo">＋ Novo QR</a></div>
+  <div class="mono" style="color:var(--pri)">Bom treino, ${esc(p.nickname||(p.name||'').split(' ')[0])}</div>
   <h1 style="font-size:clamp(34px,7vw,52px);margin:10px 0 22px">Sua segurança<br><span style="color:var(--pri)">vai com você.</span></h1>
   <div class="bib"><i class="pin a"></i><i class="pin b"></i><i class="pin c"></i><i class="pin d"></i>
    <div class="bib-band"><span>Corre com segurança</span><span>JA Pernambuco</span></div>
-   <div class="bib-body"><div class="row"><div class="av">${esc(p.initials||initials(p.name))}</div><div><h2 style="font-size:clamp(22px,5vw,30px)">${esc(p.name)}</h2><div style="color:var(--mut);font-size:14px;margin-top:4px">${p.nickname?'“'+esc(p.nickname)+'” · ':''}${esc(p.city)}</div></div></div><div class="bib-no" title="Seu número de peito">${bibNo(p)}</div></div>
+   <div class="bib-body"><div class="row"><div class="av">${esc(p.initials||initials(p.name))}</div><div><h2 style="font-size:clamp(22px,5vw,30px)">${esc(p.name)}</h2><div style="color:var(--mut);font-size:14px;margin-top:4px">${p.nickname?'“'+esc(p.nickname)+'” · ':''}${esc(p.city||'—')}</div></div></div><div class="bib-no" title="Seu número de peito">${bibNo(p)}</div></div>
    <div class="bib-tear"><span>Grupo: <b>${esc(p.group||'não informado')}</b></span><span>Contato: <b>${esc(p.cName||'não informado')}</b></span></div></div>
   ${ready(p)}
   <div class="grid g2" style="margin-top:18px">
    <div class="card"><div class="mono">Central de segurança</div>
-    <div class="actions"><a class="btn p" href="${esc(url.slice(url.indexOf('#')))}">Abrir visão pública</a><button class="btn" id="cp">Copiar link público</button><button class="btn" id="dl">Baixar QR Code</button><button class="btn" id="pr">Imprimir / salvar PDF</button><a class="btn" href="#/perfil">Editar este QR</a><a class="btn" href="#/duplicar">Duplicar este QR</a><button class="btn d" id="rm" style="grid-column:1/-1">Excluir este QR</button></div>
-    <div class="note">Todos os dados ficam <b>dentro do próprio QR</b> e no seu dispositivo. Ao editar o perfil, o QR muda: baixe e imprima o novo. QRs antigos continuam mostrando os dados antigos.</div></div>
+    <div class="actions"><a class="btn p" href="#/e/${esc(p.public_id)}" target="_blank" rel="noopener">Abrir visão pública</a><button class="btn" id="cp">Copiar link público</button><button class="btn" id="dl">Baixar QR Code</button><button class="btn" id="pr">Imprimir / salvar PDF</button><a class="btn" href="#/perfil/${esc(p.id)}">Editar este QR</a><a class="btn" href="#/duplicar/${esc(p.id)}">Duplicar este QR</a><button class="btn d" id="rm" style="grid-column:1/-1">Excluir este QR</button></div>
+    <div class="note">O QR aponta para <b>#/e/${esc(p.public_id)}</b> e <b>nunca muda</b>. Editar o perfil só atualiza o que ele mostra — os adesivos já impressos continuam válidos.</div></div>
    <div class="card" style="text-align:center"><div class="mono" style="text-align:left">Seu código pessoal</div><h2 style="font-size:24px;text-align:left;margin-top:8px">Pronto para<br>colar na pouch.</h2>
-    ${q?`<div class="qrbox">${qrSvg(q)}<i class="scan"></i></div>`:'<p class="note">Informações demais para caber no QR. Encurte a mensagem ou os campos médicos.</p>'}
+    ${q?`<div class="qrbox">${qrSvg(q)}<i class="scan"></i></div>`:'<p class="note">Não foi possível gerar o QR.</p>'}
     <div class="link">${esc(url)}</div></div></div></div>`;
-  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(url);toast('Link copiado')}catch{prompt('Copie seu link público:',url)}};
-  $('#dl').onclick=()=>q?qrPng(q,p.label||p.nickname||p.name):toast('QR muito grande');
-  $('#pr').onclick=()=>{if(!q)return toast('QR muito grande');$('#sheet').innerHTML=`<h1>${esc(p.name)}</h1><p>Em caso de emergência, escaneie</p>${qrSvg(q)}<p>QR Runner · JA Pernambuco</p>`;window.print()};
-  $('#rm').onclick=()=>{if(confirm('Excluir este QR deste aparelho? Os adesivos já impressos continuarão funcionando.')){removeP(p.id);location.hash='#/';route()}};
-  document.querySelectorAll('.qchip[data-id]').forEach(b=>b.onclick=()=>{setActive(b.dataset.id);route()});
+
+  document.querySelectorAll('.qchip[data-id]').forEach(b=>b.onclick=()=>{localStorage.setItem(activeKey(),b.dataset.id);route()});
+  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(url);toast('Link copiado')}catch{prompt('Copie seu link:',url)}};
+  $('#dl').onclick=()=>q?qrPng(q,p.label||p.nickname||p.name):toast('QR indisponível');
+  $('#pr').onclick=()=>{if(!q)return toast('QR indisponível');$('#sheet').innerHTML=`<h1>${esc(p.name)}</h1><p>Em caso de emergência, escaneie</p>${qrSvg(q)}<p>QR Runner · JA Pernambuco</p>`;window.print()};
+  $('#rm').onclick=async()=>{if(!confirm('Excluir este QR? O link público deixa de funcionar imediatamente.'))return;
+    const {error}=await db.from('profiles').delete().eq('id',p.id);
+    if(error)return toast('Erro: '+error.message);
+    toast('QR excluído');localStorage.removeItem(activeKey());route()};
+  bindLogout();
 }
 
-function form(p,base){
+function errorView(msg){app.innerHTML=`<div class="wrap" style="max-width:520px"><div class="card" style="text-align:center"><div style="font-size:40px">⚠️</div><h1 style="font-size:26px;margin:10px 0">Algo deu errado.</h1><p style="color:var(--mut)">${esc(msg)}</p><a class="btn p" href="#/">Tentar novamente</a></div></div>`}
+
+/* ===================== FORM (criar / editar) ===================== */
+async function editView(id){
+  loading('Carregando perfil…');
+  const {data,error}=await db.from('profiles').select('*').eq('id',id).maybeSingle();
+  if(error||!data)return errorView('Perfil não encontrado.');
+  formView(fromDb(data));
+}
+async function duplicateView(id){
+  loading('Carregando perfil…');
+  const {data,error}=await db.from('profiles').select('*').eq('id',id).maybeSingle();
+  if(error||!data)return errorView('Perfil não encontrado.');
+  const p=fromDb(data);p.id=null;p.public_id=null;p.label='';
+  formView(null,p);
+}
+
+function formView(p,base){
   const v=p||base||{showMed:true},isNew=!p,f=k=>esc(v[k]||'');
-  app.innerHTML=`<div class="wrap" style="max-width:760px">${head(isNew&&!load()?'':'<a class="btn" href="#/">Cancelar</a>')}
-  <div class="mono" style="color:var(--pri)">${isNew?'Primeiro passo':'Editar informações'}</div>
+  app.innerHTML=`<div class="wrap" style="max-width:760px">${headAuth('<a class="btn" href="#/">Cancelar</a>')}
+  <div class="mono" style="color:var(--pri)">${isNew?'Nova safety card':'Editar informações'}</div>
   <h1 style="font-size:clamp(30px,6vw,44px);margin:8px 0 22px">${isNew?'Monte sua safety card.':'Seu perfil, do seu jeito.'}</h1>
   <form id="f" class="grid">
   <section class="card"><div class="mono" style="margin-bottom:14px">Sobre você</div><div class="f2">
@@ -179,13 +316,44 @@ function form(p,base){
    <div class="f2" style="margin-top:16px"><label>Alergias<input name="allergies" maxlength="60" value="${f('allergies')}" placeholder="Ex.: alergia a dipirona"></label>
    <label>Tipo sanguíneo<select name="blood"><option value="">Não informar</option>${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(t=>`<option ${v.blood===t?'selected':''}>${t}</option>`).join('')}</select></label>
    <label class="full">Medicamentos contínuos<input name="meds" maxlength="80" value="${f('meds')}" placeholder="Se não usa, escreva “Nenhum”"></label></div></section>
-  <div class="note" style="margin:0">Sem cadastro ou senha. Quem tiver o QR vê o que você preencher aqui, então compartilhe só o essencial.</div>
-  <button class="btn p" style="min-height:52px">${isNew?'Criar meu perfil':'Salvar alterações'} →</button></form></div>`;
+  <div class="note" style="margin:0">Quem tiver o QR vê o que você preencher aqui. Compartilhe só o essencial.</div>
+  <button class="btn p" style="min-height:52px" type="submit">${isNew?'Criar meu perfil':'Salvar alterações'} →</button></form></div>`;
   const sm=$('#sm'),med=()=>['allergies','blood','meds'].forEach(n=>document.querySelector(`[name=${n}]`).disabled=!sm.checked);med();sm.onchange=med;
-  $('#f').onsubmit=e=>{e.preventDefault();const d=new FormData(e.target),o={};F.forEach(k=>o[k]=k==='showMed'?sm.checked:(d.get(k)||'').toString().trim());
-   if(!/\d{8,}/.test(o.cPhone.replace(/\D/g,'')))return toast('Confira o telefone do contato');
-   o.initials=(o.initials||initials(o.name)).toUpperCase();if(!makeQR(link(o)))return toast('Texto longo demais para o QR');
-   o.label=(d.get('label')||'').toString().trim();o.id=p?p.id:uid();upsert(o);toast('Perfil salvo');if(!p)confetti();location.hash='#/'};
+  bindLogout();
+  $('#f').onsubmit=async e=>{
+    e.preventDefault();
+    const btn=e.target.querySelector('button[type=submit]'),old=btn.textContent;
+    const d=new FormData(e.target),o={};
+    F.forEach(k=>o[k]=k==='showMed'?sm.checked:(d.get(k)||'').toString().trim());
+    o.label=(d.get('label')||'').toString().trim();
+    if(!/\d{8,}/.test((o.cPhone||'').replace(/\D/g,'')))return toast('Confira o telefone do contato');
+    o.initials=(o.initials||initials(o.name)).toUpperCase();
+    btn.disabled=true;btn.textContent='Salvando…';
+    try{
+      if(isNew){
+        o.public_id=novoPublicId();
+        const {error}=await db.from('profiles').insert({...toDb(o),user_id:session.user.id,public_id:o.public_id});
+        if(error)throw error;
+        toast('Perfil criado');confetti();
+      }else{
+        const {error}=await db.from('profiles').update(toDb(o)).eq('id',p.id);
+        if(error)throw error;
+        toast('Perfil salvo');
+      }
+      location.hash='#/';
+    }catch(err){
+      toast('Erro: '+err.message);
+      btn.disabled=false;btn.textContent=old;
+    }
+  };
+}
+
+/* ===================== VISÃO PÚBLICA (QR) ===================== */
+async function publicView(pid){
+  loading('Carregando perfil…');
+  const {data,error}=await db.rpc('get_public_profile',{pid});
+  if(error||!data||!data.length)return invalid();
+  pub(fromDb(data[0]));
 }
 
 function pub(p){
@@ -194,21 +362,51 @@ function pub(p){
   <div class="ok">✓ Perfil com informações compartilhadas pela própria pessoa</div>
   <section class="hero" style="padding:0"><div style="padding:28px"><div class="row" style="flex-wrap:wrap"><div class="av" style="width:72px;height:72px">${esc(p.initials||initials(p.name))}</div><div><div class="mono" style="color:var(--acc)">Pessoa identificada</div><h1 style="font-size:30px;margin-top:4px">${esc(p.name)}</h1><div style="opacity:.65;font-size:14px;margin-top:4px">${esc(p.city||'Pernambuco')}${p.group?' · '+esc(p.group):''}</div></div><div class="bib-no" style="margin-left:auto;color:var(--acc);font-size:clamp(44px,12vw,64px)">${bibNo(p)}</div></div>
    <div style="margin-top:22px;padding:14px;border-radius:14px;background:rgba(255,255,255,.08)"><div class="mono" style="color:var(--acc)">Mensagem</div><p style="margin:8px 0 0">${esc(p.msg||'Por favor, entre em contato com a pessoa de confiança abaixo.')}</p></div></div>
-   <div style="background:var(--card);color:var(--fg);padding:26px 28px"><div class="mono">Contato de emergência</div><h2 style="font-size:26px;margin:8px 0 4px">${esc(p.cName)}</h2><div class="mono" style="font-size:14px;letter-spacing:.04em">${esc(p.cPhone)}</div>
+   <div style="background:var(--card);color:var(--fg);padding:26px 28px"><div class="mono">Contato de emergência</div><h2 style="font-size:26px;margin:8px 0 4px">${esc(p.cName||'—')}</h2><div class="mono" style="font-size:14px;letter-spacing:.04em">${esc(p.cPhone||'—')}</div>
    <div class="actions"><a class="btn p ring" href="tel:${ph}">📞 Ligar</a><a class="btn" href="sms:${ph}?&body=${sms}">💬 Mensagem</a></div>
    ${p.showMed&&(p.allergies||p.blood||p.meds)?`<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--bd)"><div class="mono" style="margin-bottom:10px">Informações importantes</div><div class="info">${p.allergies?`<div class="tile"><span class="mono">Alergias</span><b>${esc(p.allergies)}</b></div>`:''}${p.blood?`<div class="tile"><span class="mono">Tipo sanguíneo</span><b>${esc(p.blood)}</b></div>`:''}${p.meds?`<div class="tile"><span class="mono">Medicamentos</span><b>${esc(p.meds)}</b></div>`:''}</div></div>`:''}</div></section>
   <p class="mono" style="text-align:center;margin-top:24px"><a href="#/" style="text-decoration:underline">Criar meu QR Runner</a> · JA Pernambuco</p></div>`;
 }
 
-function invalid(){app.innerHTML=`<div class="wrap" style="max-width:520px;text-align:center;padding-top:60px"><div class="card"><div style="font-size:40px">⚠️</div><div class="mono" style="color:var(--pri);margin-top:14px">Código não encontrado</div><h1 style="font-size:30px;margin:10px 0">Não encontramos este perfil.</h1><p style="color:var(--mut)">O link pode estar incompleto. Peça à pessoa um novo QR Runner.</p><a class="btn p" href="#/">Ir para o início</a></div></div>`}
+function invalid(){app.innerHTML=`<div class="wrap" style="max-width:520px;text-align:center;padding-top:60px"><div class="card"><div style="font-size:40px">⚠️</div><div class="mono" style="color:var(--pri);margin-top:14px">Código não encontrado</div><h1 style="font-size:30px;margin:10px 0">Não encontramos este perfil.</h1><p style="color:var(--mut)">O link pode estar incompleto ou o QR foi excluído.</p><a class="btn p" href="#/">Ir para o início</a></div></div>`}
 
-function route(){
-  const h=location.hash.slice(1)||'/',p=load();window.scrollTo(0,0);
-  if(h.startsWith('/e/')){const d=dec(h.slice(3));return d?pub(d):invalid()}
-  if(h==='/novo')return form(null);if(h==='/duplicar'&&p)return form(null,{...p,label:''});if(h==='/perfil'||!p)return form(p);
-  dashboard(p);
+/* ===================== LOGOUT + MIGRAÇÃO ===================== */
+function bindLogout(){const b=$('#logout');if(b)b.onclick=async()=>{await db.auth.signOut();location.hash='#/login'}}
+
+async function maybeMigrateHTML(){
+  let old=null;try{const v=localStorage.getItem('qr-runner-ja-v3');if(v)old=JSON.parse(v)}catch{}
+  if(!old||!old.list||!old.list.length)return '';
+  return `<div class="card" style="margin-top:18px" id="mig-card">
+    <div class="mono">Encontramos dados antigos</div>
+    <p style="margin:8px 0 14px">Você tem ${old.list.length} perfil(is) salvos neste aparelho (versão anterior). Quer importar para sua conta?</p>
+    <div class="actions" style="margin-top:0">
+      <button class="btn p" id="mig-yes">Importar</button>
+      <button class="btn" id="mig-no">Descartar</button>
+    </div></div>`;
 }
-addEventListener('hashchange',route);route();
+function bindMigrate(){
+  const y=$('#mig-yes'),n=$('#mig-no');if(!y)return;
+  y.onclick=async()=>{
+    let old=null;try{old=JSON.parse(localStorage.getItem('qr-runner-ja-v3'))}catch{}
+    if(!old||!old.list)return;
+    loading('Importando…');
+    const rows=old.list.map(p=>({...toDb(p),user_id:session.user.id,public_id:novoPublicId()}));
+    const {error}=await db.from('profiles').insert(rows);
+    if(error)return toast('Erro: '+error.message);
+    localStorage.removeItem('qr-runner-ja-v3');
+    toast('Importado!');route();
+  };
+  n.onclick=()=>{localStorage.removeItem('qr-runner-ja-v3');$('#mig-card')?.remove()};
+}
+
+/* ===================== BOOT ===================== */
+db.auth.onAuthStateChange((ev,s)=>{
+  if(ev==='INITIAL_SESSION')return;
+  session=s;route();
+});
+db.auth.getSession().then(({data})=>{session=data.session;booted=true;route()});
+
+addEventListener('hashchange',route);
 </script>
 </body>
 </html>
