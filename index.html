@@ -157,8 +157,16 @@ async function route(){
 
   if(h.startsWith('/e/')) return publicView(h.slice(3).toUpperCase());
   if(h.startsWith('/a/')) return activateView(h.slice(3).toUpperCase());
-  if(h.startsWith('/p/')){const[,pid,tok]=h.split('/');return ownerView(pid.toUpperCase(),tok)}
-  if(h.startsWith('/ed/')){const[,pid,tok]=h.split('/');return editView(pid.toUpperCase(),tok)}
+
+  if(h.startsWith('/p/')){
+    const parts=h.split('/');
+    return ownerView((parts[2]||'').toUpperCase(),(parts[3]||'').toUpperCase());
+  }
+  if(h.startsWith('/ed/')){
+    const parts=h.split('/');
+    return editView((parts[2]||'').toUpperCase(),(parts[3]||'').toUpperCase());
+  }
+
   if(h==='/entrar') return enterView();
   return homeView();
 }
