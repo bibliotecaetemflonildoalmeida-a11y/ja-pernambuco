@@ -89,12 +89,6 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .tag.new{background:rgba(249,200,35,.22);border-color:rgba(249,200,35,.6);color:var(--pri)}
 .tokenbox{margin-top:16px;padding:18px;border-radius:14px;background:var(--sec);color:var(--secfg);text-align:center}
 .tokenbox .tok{font:800 clamp(16px,4.5vw,24px) 'DM Mono',monospace;letter-spacing:.1em;word-break:break-all;line-height:1.35;margin:10px 0}
-.owned{display:grid;gap:10px;margin-top:14px}
-.owned-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--bd);border-radius:14px;background:var(--bg);text-align:left;cursor:pointer;transition:border-color .15s}
-.owned-item:hover{border-color:var(--pri)}
-.owned-item .av{width:44px;height:44px;font-size:14px;box-shadow:3px 3px 0 var(--pri)}
-.owned-item b{display:block;font-size:14px}
-.owned-item small{color:var(--mut);font-size:12px}
 </style>
 </head>
 <body>
@@ -113,14 +107,6 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const initials=n=>(n||'').trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
 const bibNo=p=>{let h=0;for(const c of (p.name||'')+(p.cPhone||'')+(p.public_id||''))h=(h*31+c.charCodeAt(0))>>>0;return String(h%9000+1000)};
 const publicLink=pid=>location.href.split('#')[0]+'#/e/'+pid;
-
-/* Lista de FlôBags deste aparelho: [{pid, token}] */
-const MINE='flobag-mine';
-const getMine=()=>{try{return JSON.parse(localStorage.getItem(MINE)||'[]')}catch{return[]}};
-const setMine=a=>localStorage.setItem(MINE,JSON.stringify(a));
-const addMine=(pid,token)=>{const m=getMine().filter(x=>x.pid!==pid);m.push({pid,token});setMine(m)};
-const rmMine=pid=>setMine(getMine().filter(x=>x.pid!==pid));
-const findMine=pid=>getMine().find(x=>x.pid===pid);
 
 /* Mapeia linhas do banco para objetos do app */
 const fromDb=r=>({
@@ -173,38 +159,24 @@ async function route(){
 
 /* ===================== HOME ===================== */
 function homeView(){
-  const mine=getMine();
   app.innerHTML=`<div class="wrap" style="max-width:680px">
-    ${head(mine.length?'<span class="tag">'+mine.length+' FlôBag'+(mine.length>1?'s':'')+'</span>':'')}
+    ${head()}
     <div class="mono" style="color:var(--pri)">Sua segurança vai com você</div>
     <h1 style="font-size:clamp(34px,7vw,52px);margin:10px 0 22px">FlôBag<br><span style="color:var(--pri)">corre com segurança.</span></h1>
 
-    ${mine.length?`
-      <div class="card">
-        <div class="mono">Suas FlôBags neste aparelho</div>
-        <div class="owned">
-          ${mine.map(m=>`<a class="owned-item" href="#/p/${esc(m.pid)}/${esc(m.token)}">
-            <div class="av">${esc(m.pid.slice(0,2))}</div>
-            <div style="flex:1;min-width:0"><b>${esc(m.label||('FlôBag '+m.pid.slice(0,4)))}</b><small>Código ${esc(m.pid)}</small></div>
-            <span class="mono">editar →</span>
-          </a>`).join('')}
-        </div>
-      </div>
-    `:`
-      <div class="card empty">
-        <div class="av">⚡</div>
-        <h2 style="font-size:24px;margin-bottom:8px">Como funciona</h2>
-        <p style="color:var(--mut);margin:0;font-size:14.5px">Sua FlôBag tem um QR Code único. Escaneie, ative e preencha seus dados de emergência. Quem escanear depois vê suas informações e pode ligar para seu contato.</p>
-      </div>
-    `}
+    <div class="card empty">
+      <div class="av">⚡</div>
+      <h2 style="font-size:24px;margin-bottom:8px">Como funciona</h2>
+      <p style="color:var(--mut);margin:0;font-size:14.5px">Sua FlôBag tem um QR Code único. Escaneie o QR da sua pouch, ative e preencha seus dados de emergência. Quem escanear depois vê suas informações e pode ligar para seu contato.</p>
+    </div>
 
     <div class="card" style="margin-top:18px">
-      <div class="mono">Já ativou em outro aparelho?</div>
-      <p style="color:var(--mut);font-size:13px;margin:8px 0 14px">Cole o código e o token que você guardou.</p>
+      <div class="mono">Já ativou e guardou o token?</div>
+      <p style="color:var(--mut);font-size:13px;margin:8px 0 14px">Cole o código e o token que você guardou para editar seus dados de qualquer celular.</p>
       <a class="btn" href="#/entrar" style="width:100%">Tenho código + token</a>
     </div>
 
-    <div class="note" style="margin-top:18px">Escaneou o QR de uma FlôBag nova? O próprio QR abre a tela de ativação. Sem login, sem senha.</div>
+    <div class="note" style="margin-top:18px">Para ativar uma FlôBag nova, <b>escaneie o QR Code da própria pouch</b>. O QR abre a tela de ativação. Sem login, sem senha.</div>
   </div>`;
 }
 
@@ -255,8 +227,7 @@ function unclaimedView(p){
 
 function pub(p){
   const ph=(p.cPhone||'').replace(/\D/g,''),sms=encodeURIComponent(`Oi, ${p.cName}. Encontrei o perfil FlôBag de ${p.name}.`);
-  const mine=findMine(p.public_id);
-  app.innerHTML=`<div class="wrap" style="max-width:700px">${head(mine?'<a class="btn" href="#/p/'+esc(p.public_id)+'/'+esc(mine.token)+'">Editar</a>':'<span class="tag">Emergência</span>')}
+  app.innerHTML=`<div class="wrap" style="max-width:700px">${head('<span class="tag">Emergência</span>')}
   <div class="ok">✓ Perfil com informações compartilhadas pela própria pessoa</div>
   <section class="hero" style="padding:0"><div style="padding:28px"><div class="row" style="flex-wrap:wrap"><div class="av" style="width:72px;height:72px">${esc(p.initials||initials(p.name)||'??')}</div><div><div class="mono" style="color:var(--acc)">Pessoa identificada</div><h1 style="font-size:30px;margin-top:4px">${esc(p.name||'—')}</h1><div style="opacity:.65;font-size:14px;margin-top:4px">${esc(p.city||'Pernambuco')}${p.group?' · '+esc(p.group):''}</div></div><div class="bib-no" style="margin-left:auto;color:var(--acc);font-size:clamp(44px,12vw,64px)">${bibNo(p)}</div></div>
    <div style="margin-top:22px;padding:14px;border-radius:14px;background:rgba(255,255,255,.08)"><div class="mono" style="color:var(--acc)">Mensagem</div><p style="margin:8px 0 0">${esc(p.msg||'Por favor, entre em contato com a pessoa de confiança abaixo.')}</p></div></div>
@@ -281,7 +252,7 @@ async function activateView(pid){
     <div class="mono" style="color:var(--pri)">Código ${esc(pid)}</div>
     <h1 style="font-size:clamp(28px,6vw,38px);margin:10px 0 22px">Ativar esta<br>FlôBag.</h1>
     <div class="card">
-      <p style="margin:0 0 14px;color:var(--mut);font-size:14.5px">Ao ativar, este QR passa a ser <b>seu</b> neste aparelho. Você vai receber um <b>token de segurança</b> para editar seus dados depois. Guarde bem.</p>
+      <p style="margin:0 0 14px;color:var(--mut);font-size:14.5px">Ao ativar, este QR passa a ser <b>seu</b>. Você vai receber um <b>token de segurança</b> para editar seus dados depois. Guarde bem.</p>
       <button class="btn p" id="go" style="width:100%;min-height:52px">Ativar agora →</button>
     </div>
     <div class="warn"><b>Importante:</b> o token é mostrado <b>uma única vez</b>. Se perdê-lo, não conseguimos recuperar. Anote, tire print, mande para você mesmo.</div>
@@ -296,13 +267,13 @@ async function activateView(pid){
       return;
     }
     const token=data;
-    addMine(pid,token);
     showTokenOnce(pid,token);
   };
 }
 
 function showTokenOnce(pid,token){
-  const txt=`FlôBag · JA Pernambuco\n\nCódigo: ${pid}\nToken: ${token}\n\nPainel: ${location.href.split('#')[0]}#/p/${pid}/${token}\nPúblico: ${publicLink(pid)}\n\nGuarde este arquivo. Sem o token não é possível editar.`;
+  const painel=`${location.href.split('#')[0]}#/p/${pid}/${token}`;
+  const txt=`FlôBag · JA Pernambuco\n\nCódigo: ${pid}\nToken: ${token}\n\nPainel: ${painel}\nPúblico: ${publicLink(pid)}\n\nGuarde este arquivo. Sem o token não é possível editar.`;
   app.innerHTML=`<div class="wrap" style="max-width:560px">
     ${head()}
     <div class="ok">✓ FlôBag ativada com sucesso</div>
@@ -318,7 +289,7 @@ function showTokenOnce(pid,token){
         <button class="btn" id="dl" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:var(--secfg)">Baixar .txt</button>
       </div>
     </div>
-    <div class="warn" style="margin-top:16px"><b>Sem este token não há como editar.</b> Não guardamos cópia. Anote, tire print ou mande para você mesmo.</div>
+    <div class="warn" style="margin-top:16px"><b>Sem este token não há como editar.</b> Não guardamos cópia. Anote, tire print ou mande para você mesmo por WhatsApp/e-mail.</div>
     <div class="card" style="margin-top:18px">
       <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">
         <input type="checkbox" id="ack" style="width:auto;margin:4px 0 0;transform:scale(1.4)">
@@ -334,14 +305,13 @@ function showTokenOnce(pid,token){
 }
 
 function alreadyClaimed(p){
-  const mine=findMine(p.public_id);
   app.innerHTML=`<div class="wrap" style="max-width:560px">
     ${head('<a class="btn" href="#/">Início</a>')}
     <div class="card" style="text-align:center;padding:36px 26px">
       <div style="font-size:40px">🔒</div>
       <h1 style="font-size:26px;margin:12px 0 8px">Esta FlôBag já foi ativada.</h1>
-      <p style="color:var(--mut);margin:0 0 22px">Se foi você quem ativou e está neste aparelho, é só acessar pelo painel.</p>
-      ${mine?`<a class="btn p" href="#/p/${esc(p.public_id)}/${esc(mine.token)}" style="min-height:50px;width:100%">Abrir minha FlôBag →</a>`:''}
+      <p style="color:var(--mut);margin:0 0 22px">Se foi você quem ativou e guardou o token, é só acessar pelo botão abaixo.</p>
+      <a class="btn p" href="#/entrar" style="min-height:50px;width:100%">Tenho código + token</a>
       <a class="btn" href="#/e/${esc(p.public_id)}" style="width:100%;margin-top:10px">Ver ficha pública</a>
     </div>
   </div>`;
@@ -353,10 +323,9 @@ async function ownerView(pid,token){
   const {data,error}=await db.rpc('get_profile_for_edit',{pid,token});
   if(error||!data||!data.length)return wrongToken();
   const p=fromDb(data[0]);
-  addMine(pid,token);
 
   const url=publicLink(pid),q=makeQR(url);
-  app.innerHTML=`<div class="wrap">${head('<a class="btn" href="#/">Minhas FlôBags</a>')}
+  app.innerHTML=`<div class="wrap">${head('<a class="btn" href="#/">Início</a>')}
   <div class="mono" style="color:var(--pri)">Painel da FlôBag</div>
   <h1 style="font-size:clamp(32px,7vw,48px);margin:10px 0 22px">${esc(p.name||'Sua FlôBag')}${p.nickname?' <span style="color:var(--pri)">· '+esc(p.nickname)+'</span>':''}</h1>
   <div class="bib"><i class="pin a"></i><i class="pin b"></i><i class="pin c"></i><i class="pin d"></i>
@@ -380,7 +349,7 @@ async function ownerView(pid,token){
     if(!confirm('Excluir esta FlôBag? O link público para de funcionar. Não dá para desfazer.'))return;
     const {data:ok,error}=await db.rpc('delete_profile',{pid,token});
     if(error||!ok)return toast('Erro ao excluir');
-    rmMine(pid);toast('FlôBag excluída');location.hash='#/';
+    toast('FlôBag excluída');location.hash='#/';
   };
 }
 
