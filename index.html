@@ -18,7 +18,7 @@ h1,h2,h3{font-family:Syne,Manrope,sans-serif;margin:0;letter-spacing:-.02em;line
 .mono{font:500 10px/1.4 'DM Mono',ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:960px;margin:0 auto;padding:20px 18px 48px}
-header.top{display:flex;align-items:center;justify-content:space-between;padding:6px 0 22px;gap:12px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:6px 0 22px;gap:12px;flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:10px;font:800 17px Syne,sans-serif}
 .logo i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--pri);color:#fff;box-shadow:3px 3px 0 var(--acc);font-style:normal;font-size:18px}
 .logo small{display:block;font:500 9px 'DM Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--pri)}
@@ -35,7 +35,7 @@ label{display:block;font-size:12px;font-weight:700}
 input,select,textarea{width:100%;margin-top:6px;padding:12px 13px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--fg);font:inherit;font-size:15px}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:1px}
 input:disabled,select:disabled{opacity:.45}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--fg);font:700 13px Manrope,sans-serif;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--fg);font:700 13px Manrope,sans-serif;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .15s;text-align:center}
 .btn:hover{border-color:var(--pri)}
 .btn.p{background:var(--pri);border-color:var(--pri);color:#fff;box-shadow:3px 3px 0 var(--acc)}
 .btn.p:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--acc)}
@@ -58,6 +58,7 @@ input:disabled,select:disabled{opacity:.45}
 .tile{background:var(--bg);border-radius:12px;padding:12px}
 .tile b{display:block;margin-top:4px;font-size:13px}
 .note{margin-top:16px;padding:12px 14px;border-radius:12px;background:rgba(249,200,35,.16);border:1px solid rgba(249,200,35,.5);font-size:12.5px}
+.warn{margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(198,47,38,.10);border:1px solid rgba(198,47,38,.4);font-size:13px}
 .ok{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(47,122,85,.13);border:1px solid rgba(47,122,85,.35);color:var(--ok);font-weight:800;font-size:13px;margin-bottom:16px}
 .tog{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
 .tog input{width:auto;margin:4px 0 0;transform:scale(1.5)}
@@ -81,17 +82,19 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--pri),var(--acc));animation:grow 1.1s .3s cubic-bezier(.2,.8,.2,1) both}
 @keyframes grow{from{width:0!important}}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.bib{transform:none}.scan{display:none}}
-.qrs{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 16px;margin:0 -4px 4px;scrollbar-width:thin}
-.qchip{flex:none;display:flex;align-items:center;gap:9px;min-height:46px;padding:0 16px 0 6px;border-radius:99px;border:1.5px solid var(--bd);background:var(--card);color:var(--fg);font:700 13px Manrope,sans-serif;cursor:pointer;transition:transform .12s,border-color .15s}
-.qchip i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--acc);color:#1a2238;font:800 12px Syne,sans-serif;font-style:normal}
-.qchip.on{border-color:var(--pri);box-shadow:3px 3px 0 var(--acc)}
-.qchip.add{padding:0 18px;border-style:dashed;color:var(--pri)}
-.qchip:hover{border-color:var(--pri)}.qchip:active{transform:translate(2px,2px)}
 .empty{text-align:center;padding:44px 24px}
 .empty .av{margin:0 auto 18px;width:80px;height:80px;font-size:26px}
 .loading{text-align:center;padding:70px 0;color:var(--mut);font:500 12px 'DM Mono',monospace;letter-spacing:.16em;text-transform:uppercase}
 .tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:var(--bg);border:1px solid var(--bd);font:700 11px 'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
 .tag.new{background:rgba(249,200,35,.22);border-color:rgba(249,200,35,.6);color:var(--pri)}
+.tokenbox{margin-top:16px;padding:18px;border-radius:14px;background:var(--sec);color:var(--secfg);text-align:center}
+.tokenbox .tok{font:800 clamp(16px,4.5vw,24px) 'DM Mono',monospace;letter-spacing:.1em;word-break:break-all;line-height:1.35;margin:10px 0}
+.owned{display:grid;gap:10px;margin-top:14px}
+.owned-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--bd);border-radius:14px;background:var(--bg);text-align:left;cursor:pointer;transition:border-color .15s}
+.owned-item:hover{border-color:var(--pri)}
+.owned-item .av{width:44px;height:44px;font-size:14px;box-shadow:3px 3px 0 var(--pri)}
+.owned-item b{display:block;font-size:14px}
+.owned-item small{color:var(--mut);font-size:12px}
 </style>
 </head>
 <body>
@@ -107,32 +110,32 @@ const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 /* ===================== HELPERS ===================== */
 const $=s=>document.querySelector(s),app=$('#app');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let session=null;
-const F=['name','nickname','city','group','initials','cName','cPhone','allergies','blood','meds','msg','showMed'];
 const initials=n=>(n||'').trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
-const novoPublicId=()=>{
-  const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';
-  for(let i=0;i<10;i++)s+=A[Math.floor(Math.random()*A.length)];
-  return s;
-};
-const link=p=>location.href.split('#')[0]+'#/e/'+(p.public_id||'');
 const bibNo=p=>{let h=0;for(const c of (p.name||'')+(p.cPhone||'')+(p.public_id||''))h=(h*31+c.charCodeAt(0))>>>0;return String(h%9000+1000)};
+const publicLink=pid=>location.href.split('#')[0]+'#/e/'+pid;
 
-const toDb=p=>({
-  label:p.label||null,name:p.name||null,nickname:p.nickname||null,city:p.city||null,
-  "group":p.group||null,initials:p.initials||null,c_name:p.cName||null,c_phone:p.cPhone||null,
-  allergies:p.allergies||null,blood:p.blood||null,meds:p.meds||null,msg:p.msg||null,
-  show_med:!!p.showMed
-});
+/* Lista de FlôBags deste aparelho: [{pid, token}] */
+const MINE='flobag-mine';
+const getMine=()=>{try{return JSON.parse(localStorage.getItem(MINE)||'[]')}catch{return[]}};
+const setMine=a=>localStorage.setItem(MINE,JSON.stringify(a));
+const addMine=(pid,token)=>{const m=getMine().filter(x=>x.pid!==pid);m.push({pid,token});setMine(m)};
+const rmMine=pid=>setMine(getMine().filter(x=>x.pid!==pid));
+const findMine=pid=>getMine().find(x=>x.pid===pid);
+
+/* Mapeia linhas do banco para objetos do app */
 const fromDb=r=>({
-  id:r.id,public_id:r.public_id,user_id:r.user_id,claimed_at:r.claimed_at,
-  label:r.label,name:r.name,nickname:r.nickname,city:r.city,
-  group:r.group,initials:r.initials,cName:r.c_name,cPhone:r.c_phone,allergies:r.allergies,
-  blood:r.blood,meds:r.meds,msg:r.msg,showMed:r.show_med
+  id:r.id,public_id:r.public_id,
+  label:r.label,name:r.name,nickname:r.nickname,city:r.city,group:r.group,initials:r.initials,
+  cName:r.c_name,cPhone:r.c_phone,allergies:r.allergies,blood:r.blood,meds:r.meds,msg:r.msg,showMed:r.show_med
+});
+const fromPublic=r=>({
+  public_id:r.public_id,name:r.name,nickname:r.nickname,city:r.city,group:r.group,initials:r.initials,
+  cName:r.c_name,cPhone:r.c_phone,allergies:r.allergies,blood:r.blood,meds:r.meds,msg:r.msg,
+  showMed:r.show_med,claimed:r.claimed
 });
 
 /* ===================== UI UTILS ===================== */
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2800)}
 const loading=(m='Carregando…')=>{app.innerHTML=`<div class="wrap"><div class="loading">${esc(m)}</div></div>`};
 function confetti(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const c=document.createElement('canvas'),x=c.getContext&&c.getContext('2d');if(!x)return;
  c.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99';c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);
@@ -143,7 +146,6 @@ function makeQR(text){try{const q=qrcode(0,'M');q.addData(text);q.make();return 
 function qrSvg(q){const n=q.getModuleCount(),m=2;let d='';for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;const s=n+2*m;return `<svg viewBox="0 0 ${s} ${s}" shape-rendering="crispEdges" role="img" aria-label="QR Code"><rect width="${s}" height="${s}" fill="#faf7ef"/><path d="${d}" fill="#17233d"/></svg>`}
 function qrPng(q,name){const n=q.getModuleCount(),m=2,z=Math.ceil(1000/(n+2*m)),s=(n+2*m)*z,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#faf7ef';x.fillRect(0,0,s,s);x.fillStyle='#17233d';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect((k+m)*z,(r+m)*z,z,z);const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`flobag-${(name||'qr').toLowerCase().replace(/\W+/g,'-')}.png`;document.body.appendChild(a);a.click();a.remove()}
 const head=(right='')=>`<header class="top"><a class="logo" href="#/"><i>⚡</i><span>FlôBag<small>JA Pernambuco</small></span></a>${right}</header>`;
-const headAuth=(right='')=>head(`<div style="display:flex;gap:8px;align-items:center">${right}<button class="btn" id="logout" title="Sair">Sair</button></div>`);
 
 function ready(p){const it=[['sua cidade',p.city],['mensagem para quem ajudar',p.msg],['grupo de corrida',p.group],['informações de saúde',p.showMed&&(p.allergies||p.blood||p.meds)],['nome e telefone do contato',p.cName&&p.cPhone],['seu nome',p.name]],miss=it.filter(x=>!x[1]).map(x=>x[0]),pc=Math.round((it.length-miss.length)/it.length*100);
  return `<div class="ready"><div class="ready-top"><b>Perfil ${pc}% pronto</b><span>${miss.length?'Falta: '+esc(miss.slice(0,2).join(', ')):'Tudo certo. Bom treino!'}</span></div><div class="bar"><i style="width:${pc}%"></i></div></div>`}
@@ -153,172 +155,241 @@ async function route(){
   const h=location.hash.slice(1)||'/';
   window.scrollTo(0,0);
 
-  // Rota pública (é o que o QR abre) — sempre acessível
-  if(h.startsWith('/e/')) return publicView(h.slice(3));
-
-  // Ativar FlôBag (precisa login)
-  if(h.startsWith('/ativar/')) return activateView(h.slice(8));
-
-  // Rotas protegidas
-  if(!session){
-    if(h!=='/login') return location.replace('#/login');
-    return loginView();
-  }
-  if(h==='/login') return location.replace('#/');
-  if(h==='/novo') return formView(null);
-  if(h.startsWith('/perfil/')) return editView(h.slice(8));
-  if(h.startsWith('/duplicar/')) return duplicateView(h.slice(11));
-  return dashboardView();
+  if(h.startsWith('/e/')) return publicView(h.slice(3).toUpperCase());
+  if(h.startsWith('/a/')) return activateView(h.slice(3).toUpperCase());
+  if(h.startsWith('/p/')){const[,pid,tok]=h.split('/');return ownerView(pid.toUpperCase(),tok)}
+  if(h.startsWith('/ed/')){const[,pid,tok]=h.split('/');return editView(pid.toUpperCase(),tok)}
+  if(h==='/entrar') return enterView();
+  return homeView();
 }
 
-/* ===================== AUTH ===================== */
-function loginView(){
-  let mode='login';
-  const render=()=>{
-    const isLogin=mode==='login';
-    app.innerHTML=`<div class="wrap" style="max-width:440px">
-      ${head()}
-      <div class="mono" style="color:var(--pri)">${isLogin?'Bem-vindo de volta':'Primeira vez aqui'}</div>
-      <h1 style="font-size:clamp(30px,6vw,40px);margin:8px 0 22px">${isLogin?'Entre na sua conta.':'Crie sua conta.'}</h1>
-      <form id="lf" class="card">
-        <label>Email<input name="email" type="email" required autocomplete="email" placeholder="voce@exemplo.com"></label>
-        <label style="margin-top:14px;display:block">Senha<input name="password" type="password" required minlength="6" autocomplete="${isLogin?'current-password':'new-password'}" placeholder="Mínimo 6 caracteres"></label>
-        <button class="btn p" style="width:100%;margin-top:16px;min-height:50px" type="submit">${isLogin?'Entrar':'Criar conta'} →</button>
-        <button class="btn" style="width:100%;margin-top:10px" type="button" id="toggle">${isLogin?'Não tem conta? Criar agora':'Já tem conta? Entrar'}</button>
-      </form>
-      <div class="note">Sua conta guarda suas FlôBags. Quem escanear o QR vê só o que você preencher — sem precisar de login.</div>
-    </div>`;
-    $('#toggle').onclick=()=>{mode=isLogin?'signup':'login';render()};
-    $('#lf').onsubmit=async e=>{
-      e.preventDefault();
-      const btn=e.target.querySelector('button[type=submit]'),old=btn.textContent;
-      btn.disabled=true;btn.textContent='Aguarde…';
-      const d=new FormData(e.target),email=(d.get('email')||'').toString().trim(),password=(d.get('password')||'').toString();
-      try{
-        if(isLogin){
-          const {error}=await db.auth.signInWithPassword({email,password});
-          if(error)throw error;
-        }else{
-          const {data,error}=await db.auth.signUp({email,password});
-          if(error)throw error;
-          if(!data.session){
-            toast('Confira seu email para confirmar a conta');
-            btn.disabled=false;btn.textContent=old;
-            return;
-          }
-        }
-        // login OK — checar ativação pendente
-        const pending=localStorage.getItem('pending-claim');
-        if(pending){localStorage.removeItem('pending-claim');location.hash='#/ativar/'+pending}
-        else location.hash='#/';
-      }catch(err){
-        const msg=(err.message||'').toLowerCase();
-        const pt=msg.includes('invalid login')?'Email ou senha incorretos'
-          :msg.includes('already registered')?'Este email já está cadastrado'
-          :msg.includes('password should be')?'Senha muito curta (mínimo 6)'
-          :msg.includes('email')&&msg.includes('valid')?'Email inválido'
-          :err.message||'Erro ao conectar';
-        toast(pt);
-        btn.disabled=false;btn.textContent=old;
-      }
-    };
-  };
-  render();
-}
+/* ===================== HOME ===================== */
+function homeView(){
+  const mine=getMine();
+  app.innerHTML=`<div class="wrap" style="max-width:680px">
+    ${head(mine.length?'<span class="tag">'+mine.length+' FlôBag'+(mine.length>1?'s':'')+'</span>':'')}
+    <div class="mono" style="color:var(--pri)">Sua segurança vai com você</div>
+    <h1 style="font-size:clamp(34px,7vw,52px);margin:10px 0 22px">FlôBag<br><span style="color:var(--pri)">corre com segurança.</span></h1>
 
-/* ===================== ATIVAR FLÔBAG ===================== */
-async function activateView(pid){
-  if(!session){localStorage.setItem('pending-claim',pid);return location.replace('#/login')}
-  loading('Ativando sua FlôBag…');
-  const {data,error}=await db.rpc('claim_profile',{pid});
-  if(error)return errorView(error.message.includes('já foi ativada')?'Esta FlôBag já foi ativada em outra conta.':error.message);
-  toast('FlôBag ativada! Preencha seus dados.');
-  location.replace('#/perfil/'+data);
-}
-
-/* ===================== DASHBOARD ===================== */
-const activeKey=()=>'flobag-active-'+(session?session.user.id:'anon');
-
-async function dashboardView(){
-  loading('Carregando suas FlôBags…');
-  const {data,error}=await db.from('profiles').select('*').eq('user_id',session.user.id).order('created_at');
-  if(error)return errorView(error.message);
-
-  const profiles=(data||[]).map(fromDb);
-
-  if(!profiles.length){
-    app.innerHTML=`<div class="wrap" style="max-width:600px">
-      ${headAuth()}
-      <div class="card empty">
-        <div class="av">+</div>
-        <div class="mono" style="color:var(--pri)">Nenhuma FlôBag ainda</div>
-        <h1 style="font-size:30px;margin:10px 0 8px">Ative a sua.</h1>
-        <p style="color:var(--mut);margin:0 0 22px">Escaneie o QR da sua ponchete ou crie um perfil extra para alguém da família.</p>
-        <a class="btn p" href="#/novo" style="min-height:52px">Criar um perfil extra →</a>
+    ${mine.length?`
+      <div class="card">
+        <div class="mono">Suas FlôBags neste aparelho</div>
+        <div class="owned">
+          ${mine.map(m=>`<a class="owned-item" href="#/p/${esc(m.pid)}/${esc(m.token)}">
+            <div class="av">${esc(m.pid.slice(0,2))}</div>
+            <div style="flex:1;min-width:0"><b>${esc(m.label||('FlôBag '+m.pid.slice(0,4)))}</b><small>Código ${esc(m.pid)}</small></div>
+            <span class="mono">editar →</span>
+          </a>`).join('')}
+        </div>
       </div>
-      ${await maybeMigrateHTML()}
-    </div>`;
-    bindLogout();bindMigrate();
-    return;
-  }
+    `:`
+      <div class="card empty">
+        <div class="av">⚡</div>
+        <h2 style="font-size:24px;margin-bottom:8px">Como funciona</h2>
+        <p style="color:var(--mut);margin:0;font-size:14.5px">Sua FlôBag tem um QR Code único. Escaneie, ative e preencha seus dados de emergência. Quem escanear depois vê suas informações e pode ligar para seu contato.</p>
+      </div>
+    `}
 
-  let activeId=localStorage.getItem(activeKey());
-  if(!profiles.some(p=>p.id===activeId))activeId=profiles[0].id;
-  localStorage.setItem(activeKey(),activeId);
-  const p=profiles.find(x=>x.id===activeId);
+    <div class="card" style="margin-top:18px">
+      <div class="mono">Já ativou em outro aparelho?</div>
+      <p style="color:var(--mut);font-size:13px;margin:8px 0 14px">Cole o código e o token que você guardou.</p>
+      <a class="btn" href="#/entrar" style="width:100%">Tenho código + token</a>
+    </div>
 
-  const url=link(p),q=makeQR(url);
+    <div class="note" style="margin-top:18px">Escaneou o QR de uma FlôBag nova? O próprio QR abre a tela de ativação. Sem login, sem senha.</div>
+  </div>`;
+}
 
-  app.innerHTML=`<div class="wrap">${headAuth()}
-  <div class="qrs" aria-label="Minhas FlôBags">${profiles.map(x=>`<button type="button" class="qchip${x.id===p.id?' on':''}" data-id="${x.id}"><i>${esc(x.initials||initials(x.name))}</i><span>${esc(x.label||x.nickname||(x.name||'').split(' ')[0]||x.public_id.slice(0,4))}</span></button>`).join('')}<a class="qchip add" href="#/novo">＋ Novo QR</a></div>
-  <div class="mono" style="color:var(--pri)">Bom treino, ${esc(p.nickname||(p.name||'').split(' ')[0]||'corredor')}</div>
-  <h1 style="font-size:clamp(34px,7vw,52px);margin:10px 0 22px">Sua segurança<br><span style="color:var(--pri)">vai com você.</span></h1>
+/* ===================== ENTER (colar pid + token) ===================== */
+function enterView(){
+  app.innerHTML=`<div class="wrap" style="max-width:520px">
+    ${head('<a class="btn" href="#/">Voltar</a>')}
+    <div class="mono" style="color:var(--pri)">Acessar FlôBag</div>
+    <h1 style="font-size:clamp(28px,6vw,38px);margin:8px 0 22px">Tenho código<br>e token.</h1>
+    <form id="ef" class="card">
+      <label>Código da FlôBag<input name="pid" required maxlength="10" placeholder="Ex.: K7P2M9X4Q1" style="text-transform:uppercase;font-family:'DM Mono',monospace;letter-spacing:.14em"></label>
+      <label style="margin-top:14px;display:block">Token<input name="token" required maxlength="24" placeholder="24 caracteres" style="text-transform:uppercase;font-family:'DM Mono',monospace;letter-spacing:.14em"></label>
+      <button class="btn p" style="width:100%;margin-top:16px;min-height:50px" type="submit">Acessar →</button>
+    </form>
+  </div>`;
+  $('#ef').onsubmit=e=>{
+    e.preventDefault();
+    const d=new FormData(e.target),pid=(d.get('pid')||'').toString().trim().toUpperCase(),tok=(d.get('token')||'').toString().trim().toUpperCase();
+    if(!pid||!tok)return toast('Preencha os dois campos');
+    location.hash=`#/p/${pid}/${tok}`;
+  };
+}
+
+/* ===================== VISÃO PÚBLICA (QR) ===================== */
+async function publicView(pid){
+  loading('Carregando…');
+  const {data,error}=await db.rpc('get_public_profile',{pid});
+  if(error||!data||!data.length)return invalid();
+  const p=fromPublic(data[0]);
+  if(!p.claimed)return unclaimedView(p);
+  pub(p);
+}
+
+function unclaimedView(p){
+  app.innerHTML=`<div class="wrap" style="max-width:560px">
+    ${head('<span class="tag new">Não ativada</span>')}
+    <div class="card" style="text-align:center;padding:36px 26px;margin-top:8px">
+      <div class="av" style="margin:0 auto 18px;width:80px;height:80px;font-size:26px">⚡</div>
+      <div class="mono" style="color:var(--pri)">Código ${esc(p.public_id)}</div>
+      <h1 style="font-size:clamp(28px,6vw,38px);margin:12px 0 12px">Sua FlôBag<br>ainda não foi ativada.</h1>
+      <p style="color:var(--mut);margin:0 0 26px;font-size:14.5px">Ative agora e preencha seus dados de emergência. Quem escanear o QR depois vai ver essas informações e poderá ligar ou mandar mensagem para seu contato.</p>
+      <a class="btn p" href="#/a/${esc(p.public_id)}" style="min-height:52px;width:100%">Ativar minha FlôBag →</a>
+      <p class="mono" style="margin-top:22px;line-height:1.8">Sem cadastro · sem senha</p>
+    </div>
+    <div class="note" style="margin-top:18px">Ao ativar, você concorda em compartilhar com quem escanear <b>apenas os dados que preencher</b>. Você pode editar ou apagar depois, a qualquer momento.</div>
+  </div>`;
+}
+
+function pub(p){
+  const ph=(p.cPhone||'').replace(/\D/g,''),sms=encodeURIComponent(`Oi, ${p.cName}. Encontrei o perfil FlôBag de ${p.name}.`);
+  const mine=findMine(p.public_id);
+  app.innerHTML=`<div class="wrap" style="max-width:700px">${head(mine?'<a class="btn" href="#/p/'+esc(p.public_id)+'/'+esc(mine.token)+'">Editar</a>':'<span class="tag">Emergência</span>')}
+  <div class="ok">✓ Perfil com informações compartilhadas pela própria pessoa</div>
+  <section class="hero" style="padding:0"><div style="padding:28px"><div class="row" style="flex-wrap:wrap"><div class="av" style="width:72px;height:72px">${esc(p.initials||initials(p.name)||'??')}</div><div><div class="mono" style="color:var(--acc)">Pessoa identificada</div><h1 style="font-size:30px;margin-top:4px">${esc(p.name||'—')}</h1><div style="opacity:.65;font-size:14px;margin-top:4px">${esc(p.city||'Pernambuco')}${p.group?' · '+esc(p.group):''}</div></div><div class="bib-no" style="margin-left:auto;color:var(--acc);font-size:clamp(44px,12vw,64px)">${bibNo(p)}</div></div>
+   <div style="margin-top:22px;padding:14px;border-radius:14px;background:rgba(255,255,255,.08)"><div class="mono" style="color:var(--acc)">Mensagem</div><p style="margin:8px 0 0">${esc(p.msg||'Por favor, entre em contato com a pessoa de confiança abaixo.')}</p></div></div>
+   <div style="background:var(--card);color:var(--fg);padding:26px 28px"><div class="mono">Contato de emergência</div><h2 style="font-size:26px;margin:8px 0 4px">${esc(p.cName||'—')}</h2><div class="mono" style="font-size:14px;letter-spacing:.04em">${esc(p.cPhone||'—')}</div>
+   <div class="actions"><a class="btn p ring" href="tel:${ph}">📞 Ligar</a><a class="btn" href="sms:${ph}?&body=${sms}">💬 Mensagem</a></div>
+   ${p.showMed&&(p.allergies||p.blood||p.meds)?`<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--bd)"><div class="mono" style="margin-bottom:10px">Informações importantes</div><div class="info">${p.allergies?`<div class="tile"><span class="mono">Alergias</span><b>${esc(p.allergies)}</b></div>`:''}${p.blood?`<div class="tile"><span class="mono">Tipo sanguíneo</span><b>${esc(p.blood)}</b></div>`:''}${p.meds?`<div class="tile"><span class="mono">Medicamentos</span><b>${esc(p.meds)}</b></div>`:''}</div></div>`:''}</div></section>
+  <p class="mono" style="text-align:center;margin-top:24px"><a href="#/" style="text-decoration:underline">FlôBag</a> · JA Pernambuco</p></div>`;
+}
+
+function invalid(){app.innerHTML=`<div class="wrap" style="max-width:520px;text-align:center;padding-top:60px"><div class="card"><div style="font-size:40px">⚠️</div><div class="mono" style="color:var(--pri);margin-top:14px">Código não encontrado</div><h1 style="font-size:30px;margin:10px 0">Não encontramos esta FlôBag.</h1><p style="color:var(--mut)">O link pode estar incompleto ou o QR foi removido.</p><a class="btn p" href="#/">Ir para o início</a></div></div>`}
+
+/* ===================== ATIVAR ===================== */
+async function activateView(pid){
+  loading('Verificando…');
+  const {data,error}=await db.rpc('get_public_profile',{pid});
+  if(error||!data||!data.length)return invalid();
+  const p=fromPublic(data[0]);
+  if(p.claimed)return alreadyClaimed(p);
+
+  app.innerHTML=`<div class="wrap" style="max-width:560px">
+    ${head('<a class="btn" href="#/e/'+esc(pid)+'">Voltar</a>')}
+    <div class="mono" style="color:var(--pri)">Código ${esc(pid)}</div>
+    <h1 style="font-size:clamp(28px,6vw,38px);margin:10px 0 22px">Ativar esta<br>FlôBag.</h1>
+    <div class="card">
+      <p style="margin:0 0 14px;color:var(--mut);font-size:14.5px">Ao ativar, este QR passa a ser <b>seu</b> neste aparelho. Você vai receber um <b>token de segurança</b> para editar seus dados depois. Guarde bem.</p>
+      <button class="btn p" id="go" style="width:100%;min-height:52px">Ativar agora →</button>
+    </div>
+    <div class="warn"><b>Importante:</b> o token é mostrado <b>uma única vez</b>. Se perdê-lo, não conseguimos recuperar. Anote, tire print, mande para você mesmo.</div>
+  </div>`;
+
+  $('#go').onclick=async()=>{
+    $('#go').disabled=true;$('#go').textContent='Ativando…';
+    const {data,error}=await db.rpc('claim_profile',{pid});
+    if(error){
+      toast(error.message);
+      $('#go').disabled=false;$('#go').textContent='Ativar agora →';
+      return;
+    }
+    const token=data;
+    addMine(pid,token);
+    showTokenOnce(pid,token);
+  };
+}
+
+function showTokenOnce(pid,token){
+  const txt=`FlôBag · JA Pernambuco\n\nCódigo: ${pid}\nToken: ${token}\n\nPainel: ${location.href.split('#')[0]}#/p/${pid}/${token}\nPúblico: ${publicLink(pid)}\n\nGuarde este arquivo. Sem o token não é possível editar.`;
+  app.innerHTML=`<div class="wrap" style="max-width:560px">
+    ${head()}
+    <div class="ok">✓ FlôBag ativada com sucesso</div>
+    <h1 style="font-size:clamp(28px,6vw,38px);margin:0 0 8px">Guarde este token.</h1>
+    <p style="color:var(--mut);font-size:14.5px;margin:0 0 4px">Ele é a <b>única forma</b> de editar sua FlôBag depois. Mostramos só uma vez.</p>
+    <div class="tokenbox">
+      <div class="mono" style="color:var(--acc)">Código</div>
+      <div class="tok" style="font-size:20px">${esc(pid)}</div>
+      <div class="mono" style="color:var(--acc);margin-top:14px">Token</div>
+      <div class="tok">${esc(token)}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+        <button class="btn" id="cp" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:var(--secfg)">Copiar</button>
+        <button class="btn" id="dl" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:var(--secfg)">Baixar .txt</button>
+      </div>
+    </div>
+    <div class="warn" style="margin-top:16px"><b>Sem este token não há como editar.</b> Não guardamos cópia. Anote, tire print ou mande para você mesmo.</div>
+    <div class="card" style="margin-top:18px">
+      <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">
+        <input type="checkbox" id="ack" style="width:auto;margin:4px 0 0;transform:scale(1.4)">
+        <span style="font-weight:600;font-size:14px">Guardei o token em lugar seguro</span>
+      </label>
+      <button class="btn p" id="next" style="width:100%;margin-top:16px;min-height:50px" disabled>Continuar e preencher meus dados →</button>
+    </div>
+  </div>`;
+  $('#ack').onchange=e=>$('#next').disabled=!e.target.checked;
+  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast('Copiado')}catch{prompt('Copie:',txt)}};
+  $('#dl').onclick=()=>{const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);a.download=`flobag-${pid}.txt`;document.body.appendChild(a);a.click();a.remove()};
+  $('#next').onclick=()=>location.hash=`#/ed/${pid}/${token}`;
+}
+
+function alreadyClaimed(p){
+  const mine=findMine(p.public_id);
+  app.innerHTML=`<div class="wrap" style="max-width:560px">
+    ${head('<a class="btn" href="#/">Início</a>')}
+    <div class="card" style="text-align:center;padding:36px 26px">
+      <div style="font-size:40px">🔒</div>
+      <h1 style="font-size:26px;margin:12px 0 8px">Esta FlôBag já foi ativada.</h1>
+      <p style="color:var(--mut);margin:0 0 22px">Se foi você quem ativou e está neste aparelho, é só acessar pelo painel.</p>
+      ${mine?`<a class="btn p" href="#/p/${esc(p.public_id)}/${esc(mine.token)}" style="min-height:50px;width:100%">Abrir minha FlôBag →</a>`:''}
+      <a class="btn" href="#/e/${esc(p.public_id)}" style="width:100%;margin-top:10px">Ver ficha pública</a>
+    </div>
+  </div>`;
+}
+
+/* ===================== PAINEL DO DONO ===================== */
+async function ownerView(pid,token){
+  loading('Carregando sua FlôBag…');
+  const {data,error}=await db.rpc('get_profile_for_edit',{pid,token});
+  if(error||!data||!data.length)return wrongToken();
+  const p=fromDb(data[0]);
+  addMine(pid,token);
+
+  const url=publicLink(pid),q=makeQR(url);
+  app.innerHTML=`<div class="wrap">${head('<a class="btn" href="#/">Minhas FlôBags</a>')}
+  <div class="mono" style="color:var(--pri)">Painel da FlôBag</div>
+  <h1 style="font-size:clamp(32px,7vw,48px);margin:10px 0 22px">${esc(p.name||'Sua FlôBag')}${p.nickname?' <span style="color:var(--pri)">· '+esc(p.nickname)+'</span>':''}</h1>
   <div class="bib"><i class="pin a"></i><i class="pin b"></i><i class="pin c"></i><i class="pin d"></i>
    <div class="bib-band"><span>FlôBag · corre com segurança</span><span>JA Pernambuco</span></div>
-   <div class="bib-body"><div class="row"><div class="av">${esc(p.initials||initials(p.name)||'??')}</div><div><h2 style="font-size:clamp(22px,5vw,30px)">${esc(p.name||'—')}</h2><div style="color:var(--mut);font-size:14px;margin-top:4px">${p.nickname?'“'+esc(p.nickname)+'” · ':''}${esc(p.city||'—')}</div></div></div><div class="bib-no" title="Código da FlôBag">${bibNo(p)}</div></div>
+   <div class="bib-body"><div class="row"><div class="av">${esc(p.initials||initials(p.name)||'??')}</div><div><h2 style="font-size:clamp(22px,5vw,30px)">${esc(p.name||'—')}</h2><div style="color:var(--mut);font-size:14px;margin-top:4px">${esc(p.city||'—')}</div></div></div><div class="bib-no">${bibNo(p)}</div></div>
    <div class="bib-tear"><span>Grupo: <b>${esc(p.group||'não informado')}</b></span><span>Contato: <b>${esc(p.cName||'não informado')}</b></span></div></div>
   ${ready(p)}
   <div class="grid g2" style="margin-top:18px">
-   <div class="card"><div class="mono">Central de segurança</div>
-    <div class="actions"><a class="btn p" href="#/e/${esc(p.public_id)}" target="_blank" rel="noopener">Abrir visão pública</a><button class="btn" id="cp">Copiar link público</button><button class="btn" id="dl">Baixar QR Code</button><button class="btn" id="pr">Imprimir / salvar PDF</button><a class="btn" href="#/perfil/${esc(p.id)}">Editar este QR</a><a class="btn" href="#/duplicar/${esc(p.id)}">Duplicar este QR</a><button class="btn d" id="rm" style="grid-column:1/-1">Excluir este QR</button></div>
-    <div class="note">O QR aponta para <b>#/e/${esc(p.public_id)}</b> e <b>nunca muda</b>. Editar o perfil só atualiza o que ele mostra — os adesivos já impressos continuam válidos.</div></div>
-   <div class="card" style="text-align:center"><div class="mono" style="text-align:left">Sua FlôBag</div><h2 style="font-size:24px;text-align:left;margin-top:8px">Pronta para<br>colar na pouch.</h2>
-    ${q?`<div class="qrbox">${qrSvg(q)}<i class="scan"></i></div>`:'<p class="note">Não foi possível gerar o QR.</p>'}
+   <div class="card"><div class="mono">Ações</div>
+    <div class="actions"><a class="btn p" href="#/e/${esc(p.public_id)}" target="_blank" rel="noopener">Ver visão pública</a><button class="btn" id="cp">Copiar link público</button><button class="btn" id="dl">Baixar QR Code</button><button class="btn" id="pr">Imprimir / salvar PDF</button><a class="btn" href="#/ed/${esc(p.public_id)}/${esc(token)}" style="grid-column:1/-1">✎ Editar meus dados</a><button class="btn d" id="rm" style="grid-column:1/-1">Excluir esta FlôBag</button></div>
+    <div class="note">O QR aponta para <b>#/e/${esc(p.public_id)}</b> e nunca muda. Editar dados só atualiza o que ele mostra.</div>
+    <div class="note" style="margin-top:10px"><b>Token:</b> <span style="font-family:'DM Mono',monospace">${esc(token)}</span> — não compartilhe. Ele é o que permite editar.</div></div>
+   <div class="card" style="text-align:center"><div class="mono" style="text-align:left">QR desta FlôBag</div><h2 style="font-size:22px;text-align:left;margin-top:8px">Público e permanente.</h2>
+    ${q?`<div class="qrbox">${qrSvg(q)}<i class="scan"></i></div>`:''}
     <div class="link">${esc(url)}</div></div></div></div>`;
 
-  document.querySelectorAll('.qchip[data-id]').forEach(b=>b.onclick=()=>{localStorage.setItem(activeKey(),b.dataset.id);route()});
-  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(url);toast('Link copiado')}catch{prompt('Copie seu link:',url)}};
+  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(url);toast('Link copiado')}catch{prompt('Copie:',url)}};
   $('#dl').onclick=()=>q?qrPng(q,p.label||p.nickname||p.name||p.public_id):toast('QR indisponível');
   $('#pr').onclick=()=>{if(!q)return toast('QR indisponível');$('#sheet').innerHTML=`<h1>${esc(p.name||'FlôBag')}</h1><p>Em caso de emergência, escaneie</p>${qrSvg(q)}<p>FlôBag · JA Pernambuco</p>`;window.print()};
-  $('#rm').onclick=async()=>{if(!confirm('Excluir este QR? O link público deixa de funcionar imediatamente.'))return;
-    const {error}=await db.from('profiles').delete().eq('id',p.id);
-    if(error)return toast('Erro: '+error.message);
-    toast('QR excluído');localStorage.removeItem(activeKey());route()};
-  bindLogout();
+  $('#rm').onclick=async()=>{
+    if(!confirm('Excluir esta FlôBag? O link público para de funcionar. Não dá para desfazer.'))return;
+    const {data:ok,error}=await db.rpc('delete_profile',{pid,token});
+    if(error||!ok)return toast('Erro ao excluir');
+    rmMine(pid);toast('FlôBag excluída');location.hash='#/';
+  };
 }
 
-function errorView(msg){app.innerHTML=`<div class="wrap" style="max-width:520px"><div class="card" style="text-align:center"><div style="font-size:40px">⚠️</div><h1 style="font-size:26px;margin:10px 0">Algo deu errado.</h1><p style="color:var(--mut)">${esc(msg)}</p><a class="btn p" href="#/">Tentar novamente</a></div></div>`}
+function wrongToken(){app.innerHTML=`<div class="wrap" style="max-width:520px;text-align:center;padding-top:60px"><div class="card"><div style="font-size:40px">🔑</div><h1 style="font-size:26px;margin:12px 0 8px">Token incorreto.</h1><p style="color:var(--mut);margin:0 0 22px">Confira se digitou o token certo — sem espaços, sem confundir 0/O ou 1/I.</p><a class="btn" href="#/entrar">Tentar novamente</a></div></div>`}
 
-/* ===================== FORM (criar / editar) ===================== */
-async function editView(id){
-  loading('Carregando perfil…');
-  const {data,error}=await db.from('profiles').select('*').eq('id',id).maybeSingle();
-  if(error||!data)return errorView('Perfil não encontrado.');
-  formView(fromDb(data));
-}
-async function duplicateView(id){
-  loading('Carregando perfil…');
-  const {data,error}=await db.from('profiles').select('*').eq('id',id).maybeSingle();
-  if(error||!data)return errorView('Perfil não encontrado.');
-  const p=fromDb(data);p.id=null;p.public_id=null;p.label='';
-  formView(null,p);
-}
-
-function formView(p,base){
-  const v=p||base||{showMed:true},isNew=!p,f=k=>esc(v[k]||'');
-  app.innerHTML=`<div class="wrap" style="max-width:760px">${headAuth('<a class="btn" href="#/">Cancelar</a>')}
-  <div class="mono" style="color:var(--pri)">${isNew?'Novo QR':'Editar informações'}</div>
-  <h1 style="font-size:clamp(30px,6vw,44px);margin:8px 0 22px">${isNew?'Crie um QR extra.':'Seus dados de emergência.'}</h1>
+/* ===================== EDITAR ===================== */
+async function editView(pid,token){
+  loading('Carregando…');
+  const {data,error}=await db.rpc('get_profile_for_edit',{pid,token});
+  if(error||!data||!data.length)return wrongToken();
+  const v=fromDb(data[0]);
+  const f=k=>esc(v[k]||'');
+  const sm=v.showMed!==false;
+  app.innerHTML=`<div class="wrap" style="max-width:760px">
+  ${head('<a class="btn" href="#/p/'+esc(pid)+'/'+esc(token)+'">Cancelar</a>')}
+  <div class="mono" style="color:var(--pri)">Editar dados · ${esc(pid)}</div>
+  <h1 style="font-size:clamp(28px,6vw,40px);margin:8px 0 22px">Seus dados<br>de emergência.</h1>
   <form id="f" class="grid">
   <section class="card"><div class="mono" style="margin-bottom:14px">Sobre você</div><div class="f2">
    <label class="full">Nome deste QR <small style="font-weight:400;color:var(--mut)">só você vê</small><input name="label" maxlength="30" value="${f('label')}" placeholder="Ex.: Minha FlôBag, Filha, Bike"></label>
@@ -331,124 +402,49 @@ function formView(p,base){
    <label>Nome do contato<input name="cName" required maxlength="50" value="${f('cName')}" placeholder="Nome e sobrenome"></label>
    <label>Telefone do contato<input name="cPhone" required type="tel" inputmode="tel" maxlength="20" value="${f('cPhone')}" placeholder="(81) 99999-9999"></label>
    <label class="full">Mensagem para quem ajudar<textarea name="msg" rows="3" maxlength="200" placeholder="Ex.: Pode me ligar, sou irmã da Ana.">${f('msg')}</textarea></label></div></section>
-  <section class="card"><div class="tog"><div><div class="mono">Informações médicas</div><p style="margin:6px 0 0;color:var(--mut);font-size:13px">Opcionais. Se ativadas, aparecem para quem escanear o QR.</p></div><input type="checkbox" name="showMed" id="sm" ${v.showMed?'checked':''} aria-label="Mostrar informações médicas"></div>
+  <section class="card"><div class="tog"><div><div class="mono">Informações médicas</div><p style="margin:6px 0 0;color:var(--mut);font-size:13px">Opcionais. Se ativadas, aparecem para quem escanear o QR.</p></div><input type="checkbox" name="showMed" id="sm" ${sm?'checked':''} aria-label="Mostrar informações médicas"></div>
    <div class="f2" style="margin-top:16px"><label>Alergias<input name="allergies" maxlength="60" value="${f('allergies')}" placeholder="Ex.: alergia a dipirona"></label>
    <label>Tipo sanguíneo<select name="blood"><option value="">Não informar</option>${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(t=>`<option ${v.blood===t?'selected':''}>${t}</option>`).join('')}</select></label>
-   <label class="full">Medicamentos contínuos<input name="meds" maxlength="80" value="${f('meds')}" placeholder="Se não usa, escreva “Nenhum”"></label></div></section>
+   <label class="full">Medicamentos contínuos<input name="meds" maxlength="80" value="${f('meds')}" placeholder="Se não usa, escreva 'Nenhum'"></label></div></section>
   <div class="note" style="margin:0">Quem tiver o QR vê o que você preencher aqui. Compartilhe só o essencial.</div>
-  <button class="btn p" style="min-height:52px" type="submit">${isNew?'Criar meu QR':'Salvar alterações'} →</button></form></div>`;
-  const sm=$('#sm'),med=()=>['allergies','blood','meds'].forEach(n=>document.querySelector(`[name=${n}]`).disabled=!sm.checked);med();sm.onchange=med;
-  bindLogout();
+  <button class="btn p" style="min-height:52px" type="submit">Salvar alterações →</button></form></div>`;
+  const smEl=$('#sm'),med=()=>['allergies','blood','meds'].forEach(n=>document.querySelector(`[name=${n}]`).disabled=!smEl.checked);med();smEl.onchange=med;
   $('#f').onsubmit=async e=>{
     e.preventDefault();
     const btn=e.target.querySelector('button[type=submit]'),old=btn.textContent;
-    const d=new FormData(e.target),o={};
-    F.forEach(k=>o[k]=k==='showMed'?sm.checked:(d.get(k)||'').toString().trim());
-    o.label=(d.get('label')||'').toString().trim();
+    const d=new FormData(e.target);
+    const o={
+      label:(d.get('label')||'').toString().trim()||null,
+      name:(d.get('name')||'').toString().trim(),
+      nickname:(d.get('nickname')||'').toString().trim()||null,
+      initials:((d.get('initials')||'').toString().trim()||initials(d.get('name')||'')).toUpperCase(),
+      city:(d.get('city')||'').toString().trim()||null,
+      group:(d.get('group')||'').toString().trim()||null,
+      cName:(d.get('cName')||'').toString().trim(),
+      cPhone:(d.get('cPhone')||'').toString().trim(),
+      allergies:(d.get('allergies')||'').toString().trim()||null,
+      blood:(d.get('blood')||'').toString().trim()||null,
+      meds:(d.get('meds')||'').toString().trim()||null,
+      msg:(d.get('msg')||'').toString().trim()||null,
+      showMed:smEl.checked
+    };
     if(!/\d{8,}/.test((o.cPhone||'').replace(/\D/g,'')))return toast('Confira o telefone do contato');
-    o.initials=(o.initials||initials(o.name)).toUpperCase();
     btn.disabled=true;btn.textContent='Salvando…';
-    try{
-      if(isNew){
-        o.public_id=novoPublicId();
-        const {error}=await db.from('profiles').insert({...toDb(o),user_id:session.user.id,public_id:o.public_id});
-        if(error)throw error;
-        toast('QR criado');confetti();
-      }else{
-        const {error}=await db.from('profiles').update(toDb(o)).eq('id',p.id);
-        if(error)throw error;
-        toast('Perfil salvo');
-      }
-      location.hash='#/';
-    }catch(err){
-      toast('Erro: '+err.message);
-      btn.disabled=false;btn.textContent=old;
-    }
+    const {data:ok,error}=await db.rpc('update_profile',{
+      pid,token,
+      p_label:o.label,p_name:o.name,p_nickname:o.nickname,p_city:o.city,p_group:o.group,
+      p_initials:o.initials,p_c_name:o.cName,p_c_phone:o.cPhone,
+      p_allergies:o.allergies,p_blood:o.blood,p_meds:o.meds,p_msg:o.msg,p_show_med:o.showMed
+    });
+    if(error||!ok){toast('Erro: '+(error?error.message:'falha ao salvar'));btn.disabled=false;btn.textContent=old;return}
+    toast('Dados salvos');
+    setTimeout(()=>location.hash=`#/p/${pid}/${token}`,400);
   };
-}
-
-/* ===================== VISÃO PÚBLICA (QR) ===================== */
-async function publicView(pid){
-  loading('Carregando…');
-  const {data,error}=await db.rpc('get_public_profile',{pid});
-  if(error||!data||!data.length)return invalid();
-  const p=fromDb(data[0]);
-  if(!p.user_id)return unclaimedView(p);
-  pub(p);
-}
-
-/* QR ainda não ativado — tela de boas-vindas */
-function unclaimedView(p){
-  app.innerHTML=`<div class="wrap" style="max-width:560px">
-    ${head('<span class="tag new">Não ativada</span>')}
-    <div class="card" style="text-align:center;padding:36px 26px;margin-top:8px">
-      <div class="av" style="margin:0 auto 18px;width:80px;height:80px;font-size:26px">⚡</div>
-      <div class="mono" style="color:var(--pri)">Código ${esc(p.public_id)}</div>
-      <h1 style="font-size:clamp(28px,6vw,38px);margin:12px 0 12px">Sua FlôBag<br>ainda não foi ativada.</h1>
-      <p style="color:var(--mut);margin:0 0 26px;font-size:14.5px">Crie sua conta para configurar seus dados de emergência. Quem escanear o QR depois vai ver essas informações e poderá ligar ou mandar mensagem para seu contato.</p>
-      <a class="btn p" id="go" href="#" style="min-height:52px;width:100%">Ativar minha FlôBag →</a>
-      <p class="mono" style="margin-top:22px;line-height:1.8">Não é sua?<br><a href="#/" style="text-decoration:underline;color:var(--pri)">Saiba mais sobre a FlôBag</a></p>
-    </div>
-    <div class="note" style="margin-top:18px">Ao ativar, você concorda em compartilhar com quem escanear <b>apenas os dados que preencher</b>. Você pode editar ou apagar depois, a qualquer momento.</div>
-  </div>`;
-  $('#go').onclick=async e=>{
-    e.preventDefault();
-    if(session){location.hash='#/ativar/'+p.public_id}
-    else{localStorage.setItem('pending-claim',p.public_id);location.hash='#/login'}
-  };
-}
-
-function pub(p){
-  const ph=(p.cPhone||'').replace(/\D/g,''),sms=encodeURIComponent(`Oi, ${p.cName}. Encontrei o perfil FlôBag de ${p.name}.`);
-  app.innerHTML=`<div class="wrap" style="max-width:700px">${head('<span class="tag">Perfil de emergência</span>')}
-  <div class="ok">✓ Perfil com informações compartilhadas pela própria pessoa</div>
-  <section class="hero" style="padding:0"><div style="padding:28px"><div class="row" style="flex-wrap:wrap"><div class="av" style="width:72px;height:72px">${esc(p.initials||initials(p.name)||'??')}</div><div><div class="mono" style="color:var(--acc)">Pessoa identificada</div><h1 style="font-size:30px;margin-top:4px">${esc(p.name||'—')}</h1><div style="opacity:.65;font-size:14px;margin-top:4px">${esc(p.city||'Pernambuco')}${p.group?' · '+esc(p.group):''}</div></div><div class="bib-no" style="margin-left:auto;color:var(--acc);font-size:clamp(44px,12vw,64px)">${bibNo(p)}</div></div>
-   <div style="margin-top:22px;padding:14px;border-radius:14px;background:rgba(255,255,255,.08)"><div class="mono" style="color:var(--acc)">Mensagem</div><p style="margin:8px 0 0">${esc(p.msg||'Por favor, entre em contato com a pessoa de confiança abaixo.')}</p></div></div>
-   <div style="background:var(--card);color:var(--fg);padding:26px 28px"><div class="mono">Contato de emergência</div><h2 style="font-size:26px;margin:8px 0 4px">${esc(p.cName||'—')}</h2><div class="mono" style="font-size:14px;letter-spacing:.04em">${esc(p.cPhone||'—')}</div>
-   <div class="actions"><a class="btn p ring" href="tel:${ph}">📞 Ligar</a><a class="btn" href="sms:${ph}?&body=${sms}">💬 Mensagem</a></div>
-   ${p.showMed&&(p.allergies||p.blood||p.meds)?`<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--bd)"><div class="mono" style="margin-bottom:10px">Informações importantes</div><div class="info">${p.allergies?`<div class="tile"><span class="mono">Alergias</span><b>${esc(p.allergies)}</b></div>`:''}${p.blood?`<div class="tile"><span class="mono">Tipo sanguíneo</span><b>${esc(p.blood)}</b></div>`:''}${p.meds?`<div class="tile"><span class="mono">Medicamentos</span><b>${esc(p.meds)}</b></div>`:''}</div></div>`:''}</div></section>
-  <p class="mono" style="text-align:center;margin-top:24px"><a href="#/" style="text-decoration:underline">FlôBag</a> · JA Pernambuco</p></div>`;
-}
-
-function invalid(){app.innerHTML=`<div class="wrap" style="max-width:520px;text-align:center;padding-top:60px"><div class="card"><div style="font-size:40px">⚠️</div><div class="mono" style="color:var(--pri);margin-top:14px">Código não encontrado</div><h1 style="font-size:30px;margin:10px 0">Não encontramos esta FlôBag.</h1><p style="color:var(--mut)">O link pode estar incompleto ou o QR foi removido.</p><a class="btn p" href="#/">Ir para o início</a></div></div>`}
-
-/* ===================== LOGOUT + MIGRAÇÃO ===================== */
-function bindLogout(){const b=$('#logout');if(b)b.onclick=async()=>{await db.auth.signOut();location.hash='#/login'}}
-
-async function maybeMigrateHTML(){
-  let old=null;try{const v=localStorage.getItem('qr-runner-ja-v3');if(v)old=JSON.parse(v)}catch{}
-  if(!old||!old.list||!old.list.length)return '';
-  return `<div class="card" style="margin-top:18px" id="mig-card">
-    <div class="mono">Encontramos dados antigos</div>
-    <p style="margin:8px 0 14px">Você tem ${old.list.length} perfil(is) salvos neste aparelho (versão QR Runner). Quer importar para sua conta FlôBag?</p>
-    <div class="actions" style="margin-top:0">
-      <button class="btn p" id="mig-yes">Importar</button>
-      <button class="btn" id="mig-no">Descartar</button>
-    </div></div>`;
-}
-function bindMigrate(){
-  const y=$('#mig-yes'),n=$('#mig-no');if(!y)return;
-  y.onclick=async()=>{
-    let old=null;try{old=JSON.parse(localStorage.getItem('qr-runner-ja-v3'))}catch{}
-    if(!old||!old.list)return;
-    loading('Importando…');
-    const rows=old.list.map(p=>({...toDb(p),user_id:session.user.id,public_id:novoPublicId()}));
-    const {error}=await db.from('profiles').insert(rows);
-    if(error)return toast('Erro: '+error.message);
-    localStorage.removeItem('qr-runner-ja-v3');
-    toast('Importado!');route();
-  };
-  n.onclick=()=>{localStorage.removeItem('qr-runner-ja-v3');$('#mig-card')?.remove()};
 }
 
 /* ===================== BOOT ===================== */
-db.auth.onAuthStateChange((ev,s)=>{
-  if(ev==='INITIAL_SESSION')return;
-  session=s;route();
-});
-db.auth.getSession().then(({data})=>{session=data.session;route()});
-
 addEventListener('hashchange',route);
+route();
 </script>
 </body>
 </html>
