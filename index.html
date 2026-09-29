@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QR Runner · JA Pernambuco</title>
-<meta name="description" content="Perfil de emergência em QR Code para quem corre. Conta própria, QR único que nunca muda.">
+<title>FlôBag · JA Pernambuco</title>
+<meta name="description" content="FlôBag — a pouch de corrida com QR de emergência. Ative a sua e corra com segurança.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -18,7 +18,7 @@ h1,h2,h3{font-family:Syne,Manrope,sans-serif;margin:0;letter-spacing:-.02em;line
 .mono{font:500 10px/1.4 'DM Mono',ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:960px;margin:0 auto;padding:20px 18px 48px}
-header.top{display:flex;align-items:center;justify-content:space-between;padding:6px 0 22px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:6px 0 22px;gap:12px}
 .logo{display:flex;align-items:center;gap:10px;font:800 17px Syne,sans-serif}
 .logo i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--pri);color:#fff;box-shadow:3px 3px 0 var(--acc);font-style:normal;font-size:18px}
 .logo small{display:block;font:500 9px 'DM Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--pri)}
@@ -90,7 +90,8 @@ body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .empty{text-align:center;padding:44px 24px}
 .empty .av{margin:0 auto 18px;width:80px;height:80px;font-size:26px}
 .loading{text-align:center;padding:70px 0;color:var(--mut);font:500 12px 'DM Mono',monospace;letter-spacing:.16em;text-transform:uppercase}
-.who{font-size:12px;color:var(--mut);margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:var(--bg);border:1px solid var(--bd);font:700 11px 'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.tag.new{background:rgba(249,200,35,.22);border-color:rgba(249,200,35,.6);color:var(--pri)}
 </style>
 </head>
 <body>
@@ -106,16 +107,16 @@ const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 /* ===================== HELPERS ===================== */
 const $=s=>document.querySelector(s),app=$('#app');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let session=null,booted=false;
+let session=null;
 const F=['name','nickname','city','group','initials','cName','cPhone','allergies','blood','meds','msg','showMed'];
 const initials=n=>(n||'').trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
-
 const novoPublicId=()=>{
-  try{return crypto.randomUUID().replace(/-/g,'').slice(0,12)}catch{}
-  return Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,8);
+  const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';
+  for(let i=0;i<10;i++)s+=A[Math.floor(Math.random()*A.length)];
+  return s;
 };
-const link=p=>location.href.split('#')[0]+'#/e/'+p.public_id;
-const bibNo=p=>{let h=0;for(const c of (p.name||'')+(p.cPhone||''))h=(h*31+c.charCodeAt(0))>>>0;return String(h%9000+1000)};
+const link=p=>location.href.split('#')[0]+'#/e/'+(p.public_id||'');
+const bibNo=p=>{let h=0;for(const c of (p.name||'')+(p.cPhone||'')+(p.public_id||''))h=(h*31+c.charCodeAt(0))>>>0;return String(h%9000+1000)};
 
 const toDb=p=>({
   label:p.label||null,name:p.name||null,nickname:p.nickname||null,city:p.city||null,
@@ -124,7 +125,8 @@ const toDb=p=>({
   show_med:!!p.showMed
 });
 const fromDb=r=>({
-  id:r.id,public_id:r.public_id,label:r.label,name:r.name,nickname:r.nickname,city:r.city,
+  id:r.id,public_id:r.public_id,user_id:r.user_id,claimed_at:r.claimed_at,
+  label:r.label,name:r.name,nickname:r.nickname,city:r.city,
   group:r.group,initials:r.initials,cName:r.c_name,cPhone:r.c_phone,allergies:r.allergies,
   blood:r.blood,meds:r.meds,msg:r.msg,showMed:r.show_med
 });
@@ -139,8 +141,8 @@ function confetti(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)ret
  (function f(){x.clearRect(0,0,c.width,c.height);ps.forEach(q=>{q.vy+=.32;q.x+=q.vx;q.y+=q.vy;q.r+=.2;x.save();x.translate(q.x,q.y);x.rotate(q.r);x.fillStyle=q.col;x.fillRect(-q.s/2,-q.s/4,q.s,q.s/2);x.restore()});if(++t<120)requestAnimationFrame(f);else c.remove()})()}
 function makeQR(text){try{const q=qrcode(0,'M');q.addData(text);q.make();return q}catch{return null}}
 function qrSvg(q){const n=q.getModuleCount(),m=2;let d='';for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;const s=n+2*m;return `<svg viewBox="0 0 ${s} ${s}" shape-rendering="crispEdges" role="img" aria-label="QR Code"><rect width="${s}" height="${s}" fill="#faf7ef"/><path d="${d}" fill="#17233d"/></svg>`}
-function qrPng(q,name){const n=q.getModuleCount(),m=2,z=Math.ceil(1000/(n+2*m)),s=(n+2*m)*z,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#faf7ef';x.fillRect(0,0,s,s);x.fillStyle='#17233d';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect((k+m)*z,(r+m)*z,z,z);const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`qr-runner-${(name||'perfil').toLowerCase().replace(/\W+/g,'-')}.png`;document.body.appendChild(a);a.click();a.remove()}
-const head=(right='')=>`<header class="top"><a class="logo" href="#/"><i>⚡</i><span>QR Runner<small>JA Pernambuco</small></span></a>${right}</header>`;
+function qrPng(q,name){const n=q.getModuleCount(),m=2,z=Math.ceil(1000/(n+2*m)),s=(n+2*m)*z,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');x.fillStyle='#faf7ef';x.fillRect(0,0,s,s);x.fillStyle='#17233d';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))x.fillRect((k+m)*z,(r+m)*z,z,z);const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`flobag-${(name||'qr').toLowerCase().replace(/\W+/g,'-')}.png`;document.body.appendChild(a);a.click();a.remove()}
+const head=(right='')=>`<header class="top"><a class="logo" href="#/"><i>⚡</i><span>FlôBag<small>JA Pernambuco</small></span></a>${right}</header>`;
 const headAuth=(right='')=>head(`<div style="display:flex;gap:8px;align-items:center">${right}<button class="btn" id="logout" title="Sair">Sair</button></div>`);
 
 function ready(p){const it=[['sua cidade',p.city],['mensagem para quem ajudar',p.msg],['grupo de corrida',p.group],['informações de saúde',p.showMed&&(p.allergies||p.blood||p.meds)],['nome e telefone do contato',p.cName&&p.cPhone],['seu nome',p.name]],miss=it.filter(x=>!x[1]).map(x=>x[0]),pc=Math.round((it.length-miss.length)/it.length*100);
@@ -151,8 +153,11 @@ async function route(){
   const h=location.hash.slice(1)||'/';
   window.scrollTo(0,0);
 
-  // Rota pública: sempre acessível, sem login
+  // Rota pública (é o que o QR abre) — sempre acessível
   if(h.startsWith('/e/')) return publicView(h.slice(3));
+
+  // Ativar FlôBag (precisa login)
+  if(h.startsWith('/ativar/')) return activateView(h.slice(8));
 
   // Rotas protegidas
   if(!session){
@@ -181,7 +186,7 @@ function loginView(){
         <button class="btn p" style="width:100%;margin-top:16px;min-height:50px" type="submit">${isLogin?'Entrar':'Criar conta'} →</button>
         <button class="btn" style="width:100%;margin-top:10px" type="button" id="toggle">${isLogin?'Não tem conta? Criar agora':'Já tem conta? Entrar'}</button>
       </form>
-      <div class="note">Sua conta guarda seus perfis e QRs. Quem escanear o QR vê só o que você preencher — sem precisar de login.</div>
+      <div class="note">Sua conta guarda suas FlôBags. Quem escanear o QR vê só o que você preencher — sem precisar de login.</div>
     </div>`;
     $('#toggle').onclick=()=>{mode=isLogin?'signup':'login';render()};
     $('#lf').onsubmit=async e=>{
@@ -199,8 +204,13 @@ function loginView(){
           if(!data.session){
             toast('Confira seu email para confirmar a conta');
             btn.disabled=false;btn.textContent=old;
+            return;
           }
         }
+        // login OK — checar ativação pendente
+        const pending=localStorage.getItem('pending-claim');
+        if(pending){localStorage.removeItem('pending-claim');location.hash='#/ativar/'+pending}
+        else location.hash='#/';
       }catch(err){
         const msg=(err.message||'').toLowerCase();
         const pt=msg.includes('invalid login')?'Email ou senha incorretos'
@@ -216,11 +226,21 @@ function loginView(){
   render();
 }
 
+/* ===================== ATIVAR FLÔBAG ===================== */
+async function activateView(pid){
+  if(!session){localStorage.setItem('pending-claim',pid);return location.replace('#/login')}
+  loading('Ativando sua FlôBag…');
+  const {data,error}=await db.rpc('claim_profile',{pid});
+  if(error)return errorView(error.message.includes('já foi ativada')?'Esta FlôBag já foi ativada em outra conta.':error.message);
+  toast('FlôBag ativada! Preencha seus dados.');
+  location.replace('#/perfil/'+data);
+}
+
 /* ===================== DASHBOARD ===================== */
-const activeKey=()=>'qr-active-'+session.user.id;
+const activeKey=()=>'flobag-active-'+(session?session.user.id:'anon');
 
 async function dashboardView(){
-  loading('Carregando seus QRs…');
+  loading('Carregando suas FlôBags…');
   const {data,error}=await db.from('profiles').select('*').eq('user_id',session.user.id).order('created_at');
   if(error)return errorView(error.message);
 
@@ -231,10 +251,10 @@ async function dashboardView(){
       ${headAuth()}
       <div class="card empty">
         <div class="av">+</div>
-        <div class="mono" style="color:var(--pri)">Nenhum QR ainda</div>
-        <h1 style="font-size:30px;margin:10px 0 8px">Crie sua safety card.</h1>
-        <p style="color:var(--mut);margin:0 0 22px">Um QR que você cola na pouch, na bike ou dá pra alguém da família.</p>
-        <a class="btn p" href="#/novo" style="min-height:52px">Criar meu primeiro QR →</a>
+        <div class="mono" style="color:var(--pri)">Nenhuma FlôBag ainda</div>
+        <h1 style="font-size:30px;margin:10px 0 8px">Ative a sua.</h1>
+        <p style="color:var(--mut);margin:0 0 22px">Escaneie o QR da sua ponchete ou crie um perfil extra para alguém da família.</p>
+        <a class="btn p" href="#/novo" style="min-height:52px">Criar um perfil extra →</a>
       </div>
       ${await maybeMigrateHTML()}
     </div>`;
@@ -242,7 +262,6 @@ async function dashboardView(){
     return;
   }
 
-  // escolhe o ativo
   let activeId=localStorage.getItem(activeKey());
   if(!profiles.some(p=>p.id===activeId))activeId=profiles[0].id;
   localStorage.setItem(activeKey(),activeId);
@@ -251,26 +270,26 @@ async function dashboardView(){
   const url=link(p),q=makeQR(url);
 
   app.innerHTML=`<div class="wrap">${headAuth()}
-  <div class="qrs" aria-label="Meus QR Codes">${profiles.map(x=>`<button type="button" class="qchip${x.id===p.id?' on':''}" data-id="${x.id}"><i>${esc(x.initials||initials(x.name))}</i><span>${esc(x.label||x.nickname||(x.name||'').split(' ')[0])}</span></button>`).join('')}<a class="qchip add" href="#/novo">＋ Novo QR</a></div>
-  <div class="mono" style="color:var(--pri)">Bom treino, ${esc(p.nickname||(p.name||'').split(' ')[0])}</div>
+  <div class="qrs" aria-label="Minhas FlôBags">${profiles.map(x=>`<button type="button" class="qchip${x.id===p.id?' on':''}" data-id="${x.id}"><i>${esc(x.initials||initials(x.name))}</i><span>${esc(x.label||x.nickname||(x.name||'').split(' ')[0]||x.public_id.slice(0,4))}</span></button>`).join('')}<a class="qchip add" href="#/novo">＋ Novo QR</a></div>
+  <div class="mono" style="color:var(--pri)">Bom treino, ${esc(p.nickname||(p.name||'').split(' ')[0]||'corredor')}</div>
   <h1 style="font-size:clamp(34px,7vw,52px);margin:10px 0 22px">Sua segurança<br><span style="color:var(--pri)">vai com você.</span></h1>
   <div class="bib"><i class="pin a"></i><i class="pin b"></i><i class="pin c"></i><i class="pin d"></i>
-   <div class="bib-band"><span>Corre com segurança</span><span>JA Pernambuco</span></div>
-   <div class="bib-body"><div class="row"><div class="av">${esc(p.initials||initials(p.name))}</div><div><h2 style="font-size:clamp(22px,5vw,30px)">${esc(p.name)}</h2><div style="color:var(--mut);font-size:14px;margin-top:4px">${p.nickname?'“'+esc(p.nickname)+'” · ':''}${esc(p.city||'—')}</div></div></div><div class="bib-no" title="Seu número de peito">${bibNo(p)}</div></div>
+   <div class="bib-band"><span>FlôBag · corre com segurança</span><span>JA Pernambuco</span></div>
+   <div class="bib-body"><div class="row"><div class="av">${esc(p.initials||initials(p.name)||'??')}</div><div><h2 style="font-size:clamp(22px,5vw,30px)">${esc(p.name||'—')}</h2><div style="color:var(--mut);font-size:14px;margin-top:4px">${p.nickname?'“'+esc(p.nickname)+'” · ':''}${esc(p.city||'—')}</div></div></div><div class="bib-no" title="Código da FlôBag">${bibNo(p)}</div></div>
    <div class="bib-tear"><span>Grupo: <b>${esc(p.group||'não informado')}</b></span><span>Contato: <b>${esc(p.cName||'não informado')}</b></span></div></div>
   ${ready(p)}
   <div class="grid g2" style="margin-top:18px">
    <div class="card"><div class="mono">Central de segurança</div>
     <div class="actions"><a class="btn p" href="#/e/${esc(p.public_id)}" target="_blank" rel="noopener">Abrir visão pública</a><button class="btn" id="cp">Copiar link público</button><button class="btn" id="dl">Baixar QR Code</button><button class="btn" id="pr">Imprimir / salvar PDF</button><a class="btn" href="#/perfil/${esc(p.id)}">Editar este QR</a><a class="btn" href="#/duplicar/${esc(p.id)}">Duplicar este QR</a><button class="btn d" id="rm" style="grid-column:1/-1">Excluir este QR</button></div>
     <div class="note">O QR aponta para <b>#/e/${esc(p.public_id)}</b> e <b>nunca muda</b>. Editar o perfil só atualiza o que ele mostra — os adesivos já impressos continuam válidos.</div></div>
-   <div class="card" style="text-align:center"><div class="mono" style="text-align:left">Seu código pessoal</div><h2 style="font-size:24px;text-align:left;margin-top:8px">Pronto para<br>colar na pouch.</h2>
+   <div class="card" style="text-align:center"><div class="mono" style="text-align:left">Sua FlôBag</div><h2 style="font-size:24px;text-align:left;margin-top:8px">Pronta para<br>colar na pouch.</h2>
     ${q?`<div class="qrbox">${qrSvg(q)}<i class="scan"></i></div>`:'<p class="note">Não foi possível gerar o QR.</p>'}
     <div class="link">${esc(url)}</div></div></div></div>`;
 
   document.querySelectorAll('.qchip[data-id]').forEach(b=>b.onclick=()=>{localStorage.setItem(activeKey(),b.dataset.id);route()});
   $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(url);toast('Link copiado')}catch{prompt('Copie seu link:',url)}};
-  $('#dl').onclick=()=>q?qrPng(q,p.label||p.nickname||p.name):toast('QR indisponível');
-  $('#pr').onclick=()=>{if(!q)return toast('QR indisponível');$('#sheet').innerHTML=`<h1>${esc(p.name)}</h1><p>Em caso de emergência, escaneie</p>${qrSvg(q)}<p>QR Runner · JA Pernambuco</p>`;window.print()};
+  $('#dl').onclick=()=>q?qrPng(q,p.label||p.nickname||p.name||p.public_id):toast('QR indisponível');
+  $('#pr').onclick=()=>{if(!q)return toast('QR indisponível');$('#sheet').innerHTML=`<h1>${esc(p.name||'FlôBag')}</h1><p>Em caso de emergência, escaneie</p>${qrSvg(q)}<p>FlôBag · JA Pernambuco</p>`;window.print()};
   $('#rm').onclick=async()=>{if(!confirm('Excluir este QR? O link público deixa de funcionar imediatamente.'))return;
     const {error}=await db.from('profiles').delete().eq('id',p.id);
     if(error)return toast('Erro: '+error.message);
@@ -298,11 +317,11 @@ async function duplicateView(id){
 function formView(p,base){
   const v=p||base||{showMed:true},isNew=!p,f=k=>esc(v[k]||'');
   app.innerHTML=`<div class="wrap" style="max-width:760px">${headAuth('<a class="btn" href="#/">Cancelar</a>')}
-  <div class="mono" style="color:var(--pri)">${isNew?'Nova safety card':'Editar informações'}</div>
-  <h1 style="font-size:clamp(30px,6vw,44px);margin:8px 0 22px">${isNew?'Monte sua safety card.':'Seu perfil, do seu jeito.'}</h1>
+  <div class="mono" style="color:var(--pri)">${isNew?'Novo QR':'Editar informações'}</div>
+  <h1 style="font-size:clamp(30px,6vw,44px);margin:8px 0 22px">${isNew?'Crie um QR extra.':'Seus dados de emergência.'}</h1>
   <form id="f" class="grid">
   <section class="card"><div class="mono" style="margin-bottom:14px">Sobre você</div><div class="f2">
-   <label class="full">Nome deste QR <small style="font-weight:400;color:var(--mut)">só você vê</small><input name="label" maxlength="30" value="${f('label')}" placeholder="Ex.: Bolsa de corrida, Filha, Bike"></label>
+   <label class="full">Nome deste QR <small style="font-weight:400;color:var(--mut)">só você vê</small><input name="label" maxlength="30" value="${f('label')}" placeholder="Ex.: Minha FlôBag, Filha, Bike"></label>
    <label class="full">Nome completo<input name="name" required maxlength="60" value="${f('name')}" placeholder="Como podemos te chamar?"></label>
    <label>Apelido (opcional)<input name="nickname" maxlength="20" value="${f('nickname')}" placeholder="Ex.: Naná"></label>
    <label>Iniciais no cartão<input name="initials" maxlength="3" value="${f('initials')}" placeholder="AC"></label>
@@ -317,7 +336,7 @@ function formView(p,base){
    <label>Tipo sanguíneo<select name="blood"><option value="">Não informar</option>${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(t=>`<option ${v.blood===t?'selected':''}>${t}</option>`).join('')}</select></label>
    <label class="full">Medicamentos contínuos<input name="meds" maxlength="80" value="${f('meds')}" placeholder="Se não usa, escreva “Nenhum”"></label></div></section>
   <div class="note" style="margin:0">Quem tiver o QR vê o que você preencher aqui. Compartilhe só o essencial.</div>
-  <button class="btn p" style="min-height:52px" type="submit">${isNew?'Criar meu perfil':'Salvar alterações'} →</button></form></div>`;
+  <button class="btn p" style="min-height:52px" type="submit">${isNew?'Criar meu QR':'Salvar alterações'} →</button></form></div>`;
   const sm=$('#sm'),med=()=>['allergies','blood','meds'].forEach(n=>document.querySelector(`[name=${n}]`).disabled=!sm.checked);med();sm.onchange=med;
   bindLogout();
   $('#f').onsubmit=async e=>{
@@ -334,7 +353,7 @@ function formView(p,base){
         o.public_id=novoPublicId();
         const {error}=await db.from('profiles').insert({...toDb(o),user_id:session.user.id,public_id:o.public_id});
         if(error)throw error;
-        toast('Perfil criado');confetti();
+        toast('QR criado');confetti();
       }else{
         const {error}=await db.from('profiles').update(toDb(o)).eq('id',p.id);
         if(error)throw error;
@@ -350,25 +369,48 @@ function formView(p,base){
 
 /* ===================== VISÃO PÚBLICA (QR) ===================== */
 async function publicView(pid){
-  loading('Carregando perfil…');
+  loading('Carregando…');
   const {data,error}=await db.rpc('get_public_profile',{pid});
   if(error||!data||!data.length)return invalid();
-  pub(fromDb(data[0]));
+  const p=fromDb(data[0]);
+  if(!p.user_id)return unclaimedView(p);
+  pub(p);
+}
+
+/* QR ainda não ativado — tela de boas-vindas */
+function unclaimedView(p){
+  app.innerHTML=`<div class="wrap" style="max-width:560px">
+    ${head('<span class="tag new">Não ativada</span>')}
+    <div class="card" style="text-align:center;padding:36px 26px;margin-top:8px">
+      <div class="av" style="margin:0 auto 18px;width:80px;height:80px;font-size:26px">⚡</div>
+      <div class="mono" style="color:var(--pri)">Código ${esc(p.public_id)}</div>
+      <h1 style="font-size:clamp(28px,6vw,38px);margin:12px 0 12px">Sua FlôBag<br>ainda não foi ativada.</h1>
+      <p style="color:var(--mut);margin:0 0 26px;font-size:14.5px">Crie sua conta para configurar seus dados de emergência. Quem escanear o QR depois vai ver essas informações e poderá ligar ou mandar mensagem para seu contato.</p>
+      <a class="btn p" id="go" href="#" style="min-height:52px;width:100%">Ativar minha FlôBag →</a>
+      <p class="mono" style="margin-top:22px;line-height:1.8">Não é sua?<br><a href="#/" style="text-decoration:underline;color:var(--pri)">Saiba mais sobre a FlôBag</a></p>
+    </div>
+    <div class="note" style="margin-top:18px">Ao ativar, você concorda em compartilhar com quem escanear <b>apenas os dados que preencher</b>. Você pode editar ou apagar depois, a qualquer momento.</div>
+  </div>`;
+  $('#go').onclick=async e=>{
+    e.preventDefault();
+    if(session){location.hash='#/ativar/'+p.public_id}
+    else{localStorage.setItem('pending-claim',p.public_id);location.hash='#/login'}
+  };
 }
 
 function pub(p){
-  const ph=(p.cPhone||'').replace(/\D/g,''),sms=encodeURIComponent(`Oi, ${p.cName}. Encontrei o perfil QR Runner de ${p.name}.`);
-  app.innerHTML=`<div class="wrap" style="max-width:700px">${head('<span class="mono">Perfil de emergência</span>')}
+  const ph=(p.cPhone||'').replace(/\D/g,''),sms=encodeURIComponent(`Oi, ${p.cName}. Encontrei o perfil FlôBag de ${p.name}.`);
+  app.innerHTML=`<div class="wrap" style="max-width:700px">${head('<span class="tag">Perfil de emergência</span>')}
   <div class="ok">✓ Perfil com informações compartilhadas pela própria pessoa</div>
-  <section class="hero" style="padding:0"><div style="padding:28px"><div class="row" style="flex-wrap:wrap"><div class="av" style="width:72px;height:72px">${esc(p.initials||initials(p.name))}</div><div><div class="mono" style="color:var(--acc)">Pessoa identificada</div><h1 style="font-size:30px;margin-top:4px">${esc(p.name)}</h1><div style="opacity:.65;font-size:14px;margin-top:4px">${esc(p.city||'Pernambuco')}${p.group?' · '+esc(p.group):''}</div></div><div class="bib-no" style="margin-left:auto;color:var(--acc);font-size:clamp(44px,12vw,64px)">${bibNo(p)}</div></div>
+  <section class="hero" style="padding:0"><div style="padding:28px"><div class="row" style="flex-wrap:wrap"><div class="av" style="width:72px;height:72px">${esc(p.initials||initials(p.name)||'??')}</div><div><div class="mono" style="color:var(--acc)">Pessoa identificada</div><h1 style="font-size:30px;margin-top:4px">${esc(p.name||'—')}</h1><div style="opacity:.65;font-size:14px;margin-top:4px">${esc(p.city||'Pernambuco')}${p.group?' · '+esc(p.group):''}</div></div><div class="bib-no" style="margin-left:auto;color:var(--acc);font-size:clamp(44px,12vw,64px)">${bibNo(p)}</div></div>
    <div style="margin-top:22px;padding:14px;border-radius:14px;background:rgba(255,255,255,.08)"><div class="mono" style="color:var(--acc)">Mensagem</div><p style="margin:8px 0 0">${esc(p.msg||'Por favor, entre em contato com a pessoa de confiança abaixo.')}</p></div></div>
    <div style="background:var(--card);color:var(--fg);padding:26px 28px"><div class="mono">Contato de emergência</div><h2 style="font-size:26px;margin:8px 0 4px">${esc(p.cName||'—')}</h2><div class="mono" style="font-size:14px;letter-spacing:.04em">${esc(p.cPhone||'—')}</div>
    <div class="actions"><a class="btn p ring" href="tel:${ph}">📞 Ligar</a><a class="btn" href="sms:${ph}?&body=${sms}">💬 Mensagem</a></div>
    ${p.showMed&&(p.allergies||p.blood||p.meds)?`<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--bd)"><div class="mono" style="margin-bottom:10px">Informações importantes</div><div class="info">${p.allergies?`<div class="tile"><span class="mono">Alergias</span><b>${esc(p.allergies)}</b></div>`:''}${p.blood?`<div class="tile"><span class="mono">Tipo sanguíneo</span><b>${esc(p.blood)}</b></div>`:''}${p.meds?`<div class="tile"><span class="mono">Medicamentos</span><b>${esc(p.meds)}</b></div>`:''}</div></div>`:''}</div></section>
-  <p class="mono" style="text-align:center;margin-top:24px"><a href="#/" style="text-decoration:underline">Criar meu QR Runner</a> · JA Pernambuco</p></div>`;
+  <p class="mono" style="text-align:center;margin-top:24px"><a href="#/" style="text-decoration:underline">FlôBag</a> · JA Pernambuco</p></div>`;
 }
 
-function invalid(){app.innerHTML=`<div class="wrap" style="max-width:520px;text-align:center;padding-top:60px"><div class="card"><div style="font-size:40px">⚠️</div><div class="mono" style="color:var(--pri);margin-top:14px">Código não encontrado</div><h1 style="font-size:30px;margin:10px 0">Não encontramos este perfil.</h1><p style="color:var(--mut)">O link pode estar incompleto ou o QR foi excluído.</p><a class="btn p" href="#/">Ir para o início</a></div></div>`}
+function invalid(){app.innerHTML=`<div class="wrap" style="max-width:520px;text-align:center;padding-top:60px"><div class="card"><div style="font-size:40px">⚠️</div><div class="mono" style="color:var(--pri);margin-top:14px">Código não encontrado</div><h1 style="font-size:30px;margin:10px 0">Não encontramos esta FlôBag.</h1><p style="color:var(--mut)">O link pode estar incompleto ou o QR foi removido.</p><a class="btn p" href="#/">Ir para o início</a></div></div>`}
 
 /* ===================== LOGOUT + MIGRAÇÃO ===================== */
 function bindLogout(){const b=$('#logout');if(b)b.onclick=async()=>{await db.auth.signOut();location.hash='#/login'}}
@@ -378,7 +420,7 @@ async function maybeMigrateHTML(){
   if(!old||!old.list||!old.list.length)return '';
   return `<div class="card" style="margin-top:18px" id="mig-card">
     <div class="mono">Encontramos dados antigos</div>
-    <p style="margin:8px 0 14px">Você tem ${old.list.length} perfil(is) salvos neste aparelho (versão anterior). Quer importar para sua conta?</p>
+    <p style="margin:8px 0 14px">Você tem ${old.list.length} perfil(is) salvos neste aparelho (versão QR Runner). Quer importar para sua conta FlôBag?</p>
     <div class="actions" style="margin-top:0">
       <button class="btn p" id="mig-yes">Importar</button>
       <button class="btn" id="mig-no">Descartar</button>
@@ -404,7 +446,7 @@ db.auth.onAuthStateChange((ev,s)=>{
   if(ev==='INITIAL_SESSION')return;
   session=s;route();
 });
-db.auth.getSession().then(({data})=>{session=data.session;booted=true;route()});
+db.auth.getSession().then(({data})=>{session=data.session;route()});
 
 addEventListener('hashchange',route);
 </script>
